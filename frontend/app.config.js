@@ -24,8 +24,9 @@ module.exports = {
     plugins: ['expo-secure-store'],
     extra: {
       apiUrl: process.env.EXPO_PUBLIC_API_URL || 'http://localhost:5000',
-      // `eas init` ke baad jo projectId mile, yahan paste karo:
-      // eas: { projectId: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx' },
+      eas: {
+        projectId: '1ad55b55-2d76-4691-8b02-4ba62b54eca9',
+      },
     },
   },
 };
