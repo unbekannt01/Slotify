@@ -2,6 +2,12 @@ import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 
 export const getAutoDetectedBaseUrl = (): string => {
+  // 0. Production / EAS build: explicit URL from EXPO_PUBLIC_API_URL (set in eas.json or .env)
+  const envUrl = process.env.EXPO_PUBLIC_API_URL;
+  if (envUrl && envUrl.trim().length > 0) {
+    return envUrl.trim().replace(/\/+$/, ''); // strip trailing slash
+  }
+
   // 1. If running in web browser, use current host with port 5000
   if (Platform.OS === 'web') {
     if (typeof window !== 'undefined' && window.location?.hostname) {
