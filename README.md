@@ -7,7 +7,7 @@ Slotify is a high-frequency real-time availability management platform for salon
 ## Workspace Structure
 
 ```
-d:/Slotify/
+Slotify/
 ├── backend/                  # Plain Node.js + Express.js API & Socket.io server
 │   ├── src/
 │   │   ├── controllers/      # auth, shop, and admin controllers
