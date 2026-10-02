@@ -6,7 +6,28 @@ import { Shop } from '../entities/Shop';
 import { ShopDay, SlotItem } from '../entities/ShopDay';
 import { generateSlots, getTodayDateString } from '../services/slotService';
 
+const isProd = process.env.NODE_ENV === 'production';
+
+// Admin credentials:
+//  - Production: SEED_ADMIN_EMAIL and SEED_ADMIN_PASSWORD are REQUIRED (nothing hardcoded)
+//  - Local dev: falls back to admin@slotify.com / admin123 if env vars are not set
+const adminEmail = (process.env.SEED_ADMIN_EMAIL || (isProd ? '' : 'admin@slotify.com')).trim().toLowerCase();
+const adminPassword = process.env.SEED_ADMIN_PASSWORD || (isProd ? '' : 'admin123');
+
+// Demo shops: created by default only in local dev.
+// In production they are created only if SEED_DEMO_SHOPS=true
+const seedDemoShops = process.env.SEED_DEMO_SHOPS === 'true' || (!isProd && process.env.SEED_DEMO_SHOPS !== 'false');
+
 async function seed() {
+  if (!adminEmail || !adminPassword) {
+    console.error('[Seed] SEED_ADMIN_EMAIL and SEED_ADMIN_PASSWORD must be set when NODE_ENV=production.');
+    process.exit(1);
+  }
+  if (isProd && adminPassword.length < 8) {
+    console.error('[Seed] SEED_ADMIN_PASSWORD must be at least 8 characters in production.');
+    process.exit(1);
+  }
+
   console.log('[Seed] Connecting to database...');
   await AppDataSource.initialize();
   console.log('[Seed] Connected.');
@@ -16,9 +37,8 @@ async function seed() {
   const shopDayRepo = AppDataSource.getRepository(ShopDay);
 
   // 1. Create or update Admin User
-  const adminEmail = 'admin@slotify.com';
   let admin = await userRepo.findOne({ where: { email: adminEmail } });
-  const adminHash = await bcrypt.hash('admin123', 10);
+  const adminHash = await bcrypt.hash(adminPassword, 10);
 
   if (!admin) {
     admin = userRepo.create({
@@ -27,7 +47,7 @@ async function seed() {
       role: 'admin',
     });
     admin = await userRepo.save(admin);
-    console.log(`[Seed] Admin created: ${adminEmail} (password: admin123)`);
+    console.log(`[Seed] Admin created: ${adminEmail}${isProd ? '' : ` (password: ${adminPassword})`}`);
   } else {
     admin.passwordHash = adminHash;
     admin.role = 'admin';
@@ -35,7 +55,14 @@ async function seed() {
     console.log(`[Seed] Admin updated: ${adminEmail}`);
   }
 
-  // 2. Demo Shops definitions
+  // 2. Demo Shops (optional)
+  if (!seedDemoShops) {
+    console.log('[Seed] Skipping demo shops (set SEED_DEMO_SHOPS=true to create them).');
+    console.log('[Seed] Database seeding completed successfully! ✨');
+    await AppDataSource.destroy();
+    return;
+  }
+
   const demoShops = [
     {
       name: 'Luxe Salon & Studio',
@@ -145,7 +172,7 @@ async function seed() {
     await shopDayRepo.save(shopDay);
 
     console.log(
-      `[Seed] Created/Updated Shop: "${shop.name}" | Owner: ${owner.email} (password: ${shopData.password}) | ${slots.length} slots`
+      `[Seed] Created/Updated Shop: "${shop.name}" | Owner: ${owner.email}${isProd ? '' : ` (password: ${shopData.password})`} | ${slots.length} slots`
     );
   }
 
