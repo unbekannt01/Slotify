@@ -9,6 +9,7 @@
     "start": "node dist/server.js",
     "seed": "tsx src/scripts/seed.ts",
     "migration:run": "tsx ./node_modules/typeorm/cli.js migration:run -d src/dataSource.ts",
+    "migration:run:prod": "node ./node_modules/typeorm/cli.js migration:run -d dist/dataSource.js",
     "migration:revert": "tsx ./node_modules/typeorm/cli.js migration:revert -d src/dataSource.ts"
   },
   "keywords": [],
