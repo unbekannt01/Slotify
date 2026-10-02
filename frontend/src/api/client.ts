@@ -31,7 +31,7 @@ apiClient.interceptors.response.use(
       message = error.response.data.error;
     } else if (error.message) {
       if (error.message.includes('Network Error')) {
-        message = `Cannot reach server at ${error.config?.baseURL || 'backend'}. Please verify backend is running.`;
+        message = 'Unable to connect to live booking service. Please check your network connection and try again.';
       } else {
         message = error.message;
       }
