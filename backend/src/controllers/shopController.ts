@@ -287,7 +287,7 @@ export async function updateShopSlots(req: Request, res: Response): Promise<void
 
     // Broadcast over Socket.io channel
     broadcastToShop(shop.id, 'shop_updated', responsePayload);
-    broadcastToShop(shop.id, 'slot_changed', { slots, status: live.status });
+    broadcastToShop(shop.id, 'slot_changed', { shopId: shop.id, slots, status: live.status });
 
     res.json(responsePayload);
   } catch (error: any) {
@@ -295,3 +295,173 @@ export async function updateShopSlots(req: Request, res: Response): Promise<void
     res.status(500).json({ error: 'Failed to update slots' });
   }
 }
+
+/**
+ * Public customer slot booking endpoint (No auth required for walk-in/online customers)
+ */
+export async function bookShopSlot(req: Request, res: Response): Promise<void> {
+  try {
+    const id = req.params.id as string;
+    const { slotId, slotIds, customerName, customerPhone } = req.body;
+
+    const targetSlotId = slotId || (Array.isArray(slotIds) && slotIds.length > 0 ? slotIds[0] : null);
+    if (!targetSlotId) {
+      res.status(400).json({ error: 'slotId is required to reserve an opening' });
+      return;
+    }
+
+    const shopRepo = AppDataSource.getRepository(Shop);
+    const shop = await shopRepo.findOne({ where: { id } });
+
+    if (!shop) {
+      res.status(404).json({ error: 'Shop not found' });
+      return;
+    }
+
+    const shopDayRepo = AppDataSource.getRepository(ShopDay);
+    const todayDay = await getOrCreateTodayShopDay(shop);
+    let slots = [...todayDay.slots];
+
+    const slotIndex = slots.findIndex((s) => s.id === targetSlotId);
+    if (slotIndex === -1) {
+      res.status(404).json({ error: 'Selected slot does not exist' });
+      return;
+    }
+
+    if (slots[slotIndex].status === 'booked') {
+      res.status(409).json({ error: 'This slot is already booked. Please choose another opening.' });
+      return;
+    }
+
+    if (slots[slotIndex].status === 'closed') {
+      res.status(400).json({ error: 'This slot is currently marked closed by the studio.' });
+      return;
+    }
+
+    const name = (customerName || 'Customer').trim();
+    const phone = (customerPhone || '').trim();
+    const formattedCustomer = phone ? `${name} (${phone})` : name;
+
+    slots[slotIndex] = {
+      ...slots[slotIndex],
+      status: 'booked' as SlotStatus,
+      customerName: formattedCustomer,
+    };
+
+    todayDay.slots = slots;
+    await shopDayRepo.save(todayDay);
+
+    const live = computeLiveStatus(shop, slots);
+
+    const responsePayload = {
+      success: true,
+      message: 'Slot reserved successfully! Broadcasted live to studio.',
+      bookedSlot: slots[slotIndex],
+      shop: {
+        id: shop.id,
+        name: shop.name,
+        category: shop.category,
+        area: shop.area,
+        phone: shop.phone,
+        workingHoursStart: shop.workingHoursStart,
+        workingHoursEnd: shop.workingHoursEnd,
+        slotDurationMinutes: shop.slotDurationMinutes,
+      },
+      status: live.status,
+      currentSlot: live.currentSlot,
+      nextAvailableSlot: live.nextAvailableSlot,
+      counts: {
+        available: live.availableCount,
+        booked: live.bookedCount,
+        closed: live.closedCount,
+        total: slots.length,
+      },
+      todayDate: todayDay.date,
+      slots,
+    };
+
+    // Broadcast live over Socket.io to shop channel
+    broadcastToShop(shop.id, 'shop_updated', responsePayload);
+    broadcastToShop(shop.id, 'slot_changed', { shopId: shop.id, slots, status: live.status });
+
+    res.json(responsePayload);
+  } catch (error: any) {
+    console.error('Error reserving slot:', error);
+    res.status(500).json({ error: 'Failed to reserve slot' });
+  }
+}
+
+/**
+ * Public customer booking cancellation endpoint
+ */
+export async function cancelShopBooking(req: Request, res: Response): Promise<void> {
+  try {
+    const id = req.params.id as string;
+    const { slotId } = req.body;
+
+    if (!slotId) {
+      res.status(400).json({ error: 'slotId is required' });
+      return;
+    }
+
+    const shopRepo = AppDataSource.getRepository(Shop);
+    const shop = await shopRepo.findOne({ where: { id } });
+
+    if (!shop) {
+      res.status(404).json({ error: 'Shop not found' });
+      return;
+    }
+
+    const shopDayRepo = AppDataSource.getRepository(ShopDay);
+    const todayDay = await getOrCreateTodayShopDay(shop);
+    let slots = [...todayDay.slots];
+
+    const slotIndex = slots.findIndex((s) => s.id === slotId);
+    if (slotIndex === -1) {
+      res.status(404).json({ error: 'Slot not found' });
+      return;
+    }
+
+    slots[slotIndex] = {
+      ...slots[slotIndex],
+      status: 'available' as SlotStatus,
+      customerName: undefined,
+    };
+
+    todayDay.slots = slots;
+    await shopDayRepo.save(todayDay);
+
+    const live = computeLiveStatus(shop, slots);
+
+    const responsePayload = {
+      success: true,
+      message: 'Booking cancelled successfully. Slot is available again.',
+      shop: {
+        id: shop.id,
+        name: shop.name,
+        category: shop.category,
+        area: shop.area,
+      },
+      status: live.status,
+      currentSlot: live.currentSlot,
+      nextAvailableSlot: live.nextAvailableSlot,
+      counts: {
+        available: live.availableCount,
+        booked: live.bookedCount,
+        closed: live.closedCount,
+        total: slots.length,
+      },
+      todayDate: todayDay.date,
+      slots,
+    };
+
+    broadcastToShop(shop.id, 'shop_updated', responsePayload);
+    broadcastToShop(shop.id, 'slot_changed', { shopId: shop.id, slots, status: live.status });
+
+    res.json(responsePayload);
+  } catch (error: any) {
+    console.error('Error cancelling booking:', error);
+    res.status(500).json({ error: 'Failed to cancel booking' });
+  }
+}
+

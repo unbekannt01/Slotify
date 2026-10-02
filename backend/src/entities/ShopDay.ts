@@ -17,6 +17,7 @@ export interface SlotItem {
   start: string; // e.g. "09:00"
   end: string;   // e.g. "09:30"
   status: SlotStatus;
+  customerName?: string;
 }
 
 @Entity('shop_days')
