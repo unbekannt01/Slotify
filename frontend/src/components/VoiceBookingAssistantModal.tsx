@@ -13,6 +13,7 @@ import {
   Platform,
 } from 'react-native';
 import * as Speech from 'expo-speech';
+import { ExpoSpeechRecognitionModule } from 'expo-speech-recognition';
 import { colors } from '../theme/colors';
 import { sendVoiceCommandApi, VoiceAssistantResponse, SlotItem } from '../api/shopApi';
 
@@ -54,6 +55,7 @@ export const VoiceBookingAssistantModal: React.FC<VoiceBookingAssistantModalProp
   ]).current;
 
   const recognitionRef = useRef<any>(null);
+  const nativeSubscriptionsRef = useRef<any[]>([]);
 
   // Pulse animation loops
   useEffect(() => {
@@ -146,12 +148,16 @@ export const VoiceBookingAssistantModal: React.FC<VoiceBookingAssistantModalProp
     }
   }, [visible]);
 
-  // Initialize Speech Recognition (Web Speech API + Fallback)
-  const startSpeechRecognition = () => {
+  // Initialize Speech Recognition (Native Mobile via expo-speech-recognition + Web Speech API)
+  const startSpeechRecognition = async () => {
     setErrorMessage(null);
     setTranscript('');
     setStep('listening');
 
+    const langCode =
+      language === 'gu' ? 'gu-IN' : language === 'hi' ? 'hi-IN' : language === 'en' ? 'en-IN' : 'hi-IN';
+
+    // 1. Web browser environment
     if (Platform.OS === 'web' && typeof window !== 'undefined') {
       const SpeechRecognition =
         (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -164,19 +170,7 @@ export const VoiceBookingAssistantModal: React.FC<VoiceBookingAssistantModalProp
 
           const recognition = new SpeechRecognition();
           recognitionRef.current = recognition;
-
-          // Set language hint based on user toggle
-          if (language === 'hi') {
-            recognition.lang = 'hi-IN';
-          } else if (language === 'gu') {
-            recognition.lang = 'gu-IN';
-          } else if (language === 'en') {
-            recognition.lang = 'en-IN';
-          } else {
-            // Auto defaults to Indian English / Hindi mix
-            recognition.lang = 'hi-IN';
-          }
-
+          recognition.lang = langCode;
           recognition.continuous = false;
           recognition.interimResults = true;
 
@@ -203,12 +197,11 @@ export const VoiceBookingAssistantModal: React.FC<VoiceBookingAssistantModalProp
           };
 
           recognition.onerror = (e: any) => {
-            console.warn('[Voice Assistant] Speech recognition error:', e.error);
+            console.warn('[Voice Assistant] Web speech recognition error:', e.error);
             if (e.error === 'not-allowed') {
               setErrorMessage('Microphone access is blocked. Please allow mic permission or use typed input.');
               setStep('idle');
             } else if (e.error === 'no-speech') {
-              // Wait or remain idle
               setStep('idle');
             }
           };
@@ -221,22 +214,95 @@ export const VoiceBookingAssistantModal: React.FC<VoiceBookingAssistantModalProp
 
           recognition.start();
         } catch (err: any) {
-          console.warn('[Voice Assistant] Could not start speech recognition:', err);
+          console.warn('[Voice Assistant] Could not start web speech recognition:', err);
           setStep('idle');
         }
       } else {
-        // Browser does not support Web Speech API
         setStep('idle');
       }
+      return;
+    }
+
+    // 2. Native Mobile (Android & iOS) environment via ExpoSpeechRecognitionModule
+    try {
+      if (ExpoSpeechRecognitionModule && typeof ExpoSpeechRecognitionModule.requestPermissionsAsync === 'function') {
+        const permResult = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
+        if (!permResult.granted) {
+          setErrorMessage('Microphone and speech permissions are required for voice booking on your phone.');
+          setStep('idle');
+          return;
+        }
+
+        // Clean previous listeners
+        nativeSubscriptionsRef.current.forEach((sub) => {
+          try {
+            sub?.remove?.();
+          } catch (_) {}
+        });
+        nativeSubscriptionsRef.current = [];
+
+        // Attach native listeners
+        const resultSub = ExpoSpeechRecognitionModule.addListener('result', (event: any) => {
+          const spoken = event.results?.[0]?.transcript || '';
+          if (spoken) {
+            setTranscript(spoken);
+          }
+          if (event.isFinal && spoken.trim()) {
+            handleCommandSubmission(spoken.trim());
+          }
+        });
+
+        const errorSub = ExpoSpeechRecognitionModule.addListener('error', (event: any) => {
+          console.warn('[Voice Assistant] Native mobile speech error:', event.error, event.message);
+          if (event.error === 'not-allowed') {
+            setErrorMessage('Microphone access denied. Please grant microphone permission in app settings.');
+          }
+          setStep('idle');
+        });
+
+        const endSub = ExpoSpeechRecognitionModule.addListener('end', () => {
+          if (step === 'listening') {
+            setStep('idle');
+          }
+        });
+
+        nativeSubscriptionsRef.current = [resultSub, errorSub, endSub];
+
+        await ExpoSpeechRecognitionModule.start({
+          lang: langCode,
+          interimResults: true,
+          continuous: false,
+        });
+      } else {
+        // Fallback if running on Expo Go without native prebuild
+        console.info('[Voice Assistant] Native speech module not active in current environment.');
+      }
+    } catch (mobileErr: any) {
+      console.warn('[Voice Assistant] Mobile speech recognition start error:', mobileErr);
+      setStep('idle');
     }
   };
 
   const stopSpeechRecognition = () => {
-    if (recognitionRef.current) {
+    if (Platform.OS === 'web') {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.stop();
+        } catch (_) {}
+        recognitionRef.current = null;
+      }
+    } else {
       try {
-        recognitionRef.current.stop();
+        if (ExpoSpeechRecognitionModule && typeof ExpoSpeechRecognitionModule.stop === 'function') {
+          ExpoSpeechRecognitionModule.stop();
+        }
       } catch (_) {}
-      recognitionRef.current = null;
+      nativeSubscriptionsRef.current.forEach((sub) => {
+        try {
+          sub?.remove?.();
+        } catch (_) {}
+      });
+      nativeSubscriptionsRef.current = [];
     }
   };
 
