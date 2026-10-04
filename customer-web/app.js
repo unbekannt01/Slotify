@@ -3,25 +3,27 @@
  * Mobile-First Lovable UI Architecture with Real-Time Socket.io Streaming
  */
 
+const RAILWAY_BACKEND_URL = 'https://slotify-production-937f.up.railway.app';
+
 const API_BASE_URL = (() => {
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.get('api')) return urlParams.get('api');
   if (typeof window !== 'undefined' && window.__SLOTIFY_API_URL__) {
     return window.__SLOTIFY_API_URL__;
   }
-  if (window.location.origin && (window.location.origin.includes('railway.app') || window.location.origin.includes('render.com') || window.location.origin.includes('vercel.app'))) {
-    return window.location.origin;
-  }
-  if (window.location.port === '5000' || window.location.pathname.startsWith('/live')) {
-    return window.location.origin;
-  }
-  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+  // If explicitly testing with a local server: ?local=true
+  if (
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') &&
+    urlParams.get('local') === 'true'
+  ) {
     return 'http://localhost:5000';
   }
-  if (/^(\d{1,3}\.){3}\d{1,3}$/.test(window.location.hostname)) {
-    return `http://${window.location.hostname}:5000`;
+  // If served directly on Railway
+  if (window.location.origin && window.location.origin.includes('railway.app')) {
+    return window.location.origin;
   }
-  return window.location.origin || 'http://localhost:5000';
+  // Production live backend for Vercel, web, mobile & external visitors
+  return RAILWAY_BACKEND_URL;
 })();
 
 // Curated Studio Photography & Meta Mapping
@@ -410,189 +412,64 @@ function initSocket() {
 }
 
 // --------------------------------------------------------------------------
-// Real-World Live Data Provider & Simulation Fallback Engine
+// Live Backend Data Fetching & Sync (100% Real Database Feed)
 // --------------------------------------------------------------------------
-function getRealWorldLiveStudios() {
-  const now = new Date();
-  const currentHour = now.getHours();
-  const formatTime = (h, m) => `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+let _backendReconnectTimer = null;
 
-  function buildSlots(startH, endH, durationMin, prefix) {
-    const list = [];
-    let cur = startH * 60;
-    const end = endH * 60;
-    let i = 1;
+function renderBackendOfflineState(errorMessage) {
+  if (!studiosFeed) return;
 
-    while (cur + durationMin <= end) {
-      const sh = Math.floor(cur / 60);
-      const sm = cur % 60;
-      const eh = Math.floor((cur + durationMin) / 60);
-      const em = (cur + durationMin) % 60;
-
-      let status = 'available';
-      if (sh < currentHour) {
-        status = 'booked';
-      } else if (sh === currentHour) {
-        status = i % 2 === 0 ? 'available' : 'booked';
-      } else {
-        status = i % 3 === 0 ? 'booked' : 'available';
-      }
-
-      list.push({
-        id: `${prefix}_slot_${i++}_${sh}_${sm}`,
-        start: formatTime(sh, sm),
-        end: formatTime(eh, em),
-        status,
-        customerName: status === 'booked' ? 'Reserved Walk-in' : undefined,
-      });
-
-      cur += durationMin;
-    }
-    return list;
+  if (livePulseDot) {
+    livePulseDot.style.background = '#EF4444';
+    livePulseDot.style.boxShadow = '0 0 10px rgba(239, 68, 68, 0.6)';
   }
-
-  return [
-    {
-      shop: {
-        id: 'real-the-foundry-barbers',
-        name: 'The Foundry Barbers',
-        category: 'Barbershop',
-        area: 'Vijay Nagar (Near C21 Mall)',
-        phone: '+91 98260 11223',
-        workingHoursStart: '10:00',
-        workingHoursEnd: '21:00',
-        slotDurationMinutes: 45,
-        status: 'available',
-      },
-      slots: buildSlots(10, 21, 45, 'foundry'),
-    },
-    {
-      shop: {
-        id: 'real-luxe-salon-studio',
-        name: 'Luxe Salon & Studio',
-        category: 'Hair & Styling',
-        area: 'New Palasia / Janjeerwala Sq.',
-        phone: '+91 98260 44556',
-        workingHoursStart: '09:30',
-        workingHoursEnd: '20:30',
-        slotDurationMinutes: 45,
-        status: 'available',
-      },
-      slots: buildSlots(10, 20, 45, 'luxe'),
-    },
-    {
-      shop: {
-        id: 'real-apex-barbershop',
-        name: 'Apex Barbershop & Grooming',
-        category: 'Barbershop',
-        area: 'Saket / Old Palasia',
-        phone: '+91 98260 77889',
-        workingHoursStart: '10:00',
-        workingHoursEnd: '21:00',
-        slotDurationMinutes: 30,
-        status: 'available',
-      },
-      slots: buildSlots(10, 21, 30, 'apex'),
-    },
-    {
-      shop: {
-        id: 'real-glow-aesthetics',
-        name: 'Glow Aesthetics Lounge',
-        category: 'Spa & Wellness',
-        area: 'MG Road / Treasure Island',
-        phone: '+91 98260 99001',
-        workingHoursStart: '11:00',
-        workingHoursEnd: '20:00',
-        slotDurationMinutes: 60,
-        status: 'available',
-      },
-      slots: buildSlots(11, 20, 60, 'glow'),
-    },
-    {
-      shop: {
-        id: 'real-lumina-skin',
-        name: 'Lumina Skin Studio',
-        category: 'Skin & Facial',
-        area: 'AB Road / Scheme 54',
-        phone: '+91 98260 33445',
-        workingHoursStart: '10:30',
-        workingHoursEnd: '19:30',
-        slotDurationMinutes: 45,
-        status: 'available',
-      },
-      slots: buildSlots(11, 19, 45, 'lumina'),
-    },
-  ];
-}
-
-let _isLiveSimulationRunning = false;
-function loadRealWorldLiveFeed() {
-  const dataset = getRealWorldLiveStudios();
-  allShops = dataset.map((d) => d.shop);
-  dataset.forEach((d) => {
-    shopSlotsCache[d.shop.id] = d.slots;
-  });
-
-  updateTotalOpenings();
-  renderFeed();
-  autoSelectFirstOpenSlot();
-
-  if (statsStudiosActive) {
-    statsStudiosActive.textContent = allShops.length;
+  if (liveHeaderText) {
+    liveHeaderText.innerHTML = `BACKEND OFFLINE • <span id="total-openings-count">0</span> OPENINGS`;
   }
+  if (studiosOnlineCount) studiosOnlineCount.textContent = '0';
+  if (totalOpeningsCount) totalOpeningsCount.textContent = '0';
 
-  // Silent background health-probe to sync with backend API as soon as reached
-  if (!window._backendProbeInterval) {
-    window._backendProbeInterval = setInterval(async () => {
-      try {
-        const probe = await fetch(`${API_BASE_URL}/health`);
-        if (probe.ok) {
-          clearInterval(window._backendProbeInterval);
-          window._backendProbeInterval = null;
-          console.log('[Slotify Live] Connected to live backend API. Syncing database feed...');
-          fetchShops();
-        }
-      } catch (_) {}
-    }, 10000);
-  }
+  studiosFeed.innerHTML = `
+    <div class="empty-state">
+      <div style="font-size: 38px; margin-bottom: 10px;">🔌</div>
+      <p style="font-weight: 800; color: #F8FAFC; font-size: 16px;">Connecting to Live Backend...</p>
+      <p style="color: #94A3B8; font-size: 12.5px; margin-top: 6px; line-height: 1.5; max-width: 330px;">
+        Backend server at <code style="color: #7DD3FC; background: rgba(125,211,252,0.12); padding: 2px 6px; border-radius: 4px;">${API_BASE_URL}</code> is currently unreachable.<br/>
+        <span style="font-size: 11px; color: #64748B;">(${errorMessage || 'Connection failed'})</span>
+      </p>
+      <button onclick="fetchShops()" style="margin-top: 16px; background: #7DD3FC; border: none; color: #06090F; padding: 10px 22px; border-radius: 12px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+        ↻ Retry Live Connection
+      </button>
+    </div>
+  `;
 
-  // Start live enterprise pulse simulation
-  if (!_isLiveSimulationRunning) {
-    _isLiveSimulationRunning = true;
-    const names = ['Sahil V.', 'Aarav M.', 'Rhea S.', 'Kabir P.', 'Ananya D.', 'Vikram R.', 'Ishaan G.'];
-    setInterval(() => {
-      if (!allShops || allShops.length === 0) return;
-      const targetShop = allShops[Math.floor(Math.random() * allShops.length)];
-      const slots = shopSlotsCache[targetShop.id] || [];
-      const openSlots = slots.filter((s) => s.status === 'available');
-
-      if (openSlots.length > 1) {
-        const picked = openSlots[Math.floor(Math.random() * openSlots.length)];
-        const client = names[Math.floor(Math.random() * names.length)];
-        picked.status = 'booked';
-        picked.customerName = client;
-        refreshShopSlotPills(targetShop.id);
-        updateTotalOpenings();
-        addNotification(`Walk-in booked: ${client} at ${targetShop.name} (${picked.start})`, 'info');
-      }
-    }, 45000);
+  // Auto-retry polling every 4s
+  if (!_backendReconnectTimer) {
+    _backendReconnectTimer = setInterval(() => {
+      console.log('[Slotify Live] Attempting auto-reconnect to live backend...');
+      fetchShops();
+    }, 4000);
   }
 }
 
-// --------------------------------------------------------------------------
-// API Fetching & Cache
-// --------------------------------------------------------------------------
 async function fetchShops() {
   try {
     const res = await fetch(`${API_BASE_URL}/shops`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: Failed to fetch shops`);
     const data = await res.json();
     if (!Array.isArray(data) || data.length === 0) {
-      throw new Error('No active shops returned from API');
+      throw new Error('No active shops configured in database');
     }
+
+    // Successfully connected! Clear any retry timer
+    if (_backendReconnectTimer) {
+      clearInterval(_backendReconnectTimer);
+      _backendReconnectTimer = null;
+    }
+
     allShops = data;
 
-    // Fetch slot grids in parallel for each shop
+    // Fetch live slot grids in parallel for each shop from PostgreSQL
     await Promise.all(
       allShops.map(async (shop) => {
         try {
@@ -602,18 +479,19 @@ async function fetchShops() {
             shopSlotsCache[shop.id] = statusData.slots || [];
           }
         } catch (e) {
-          console.warn(`Failed to fetch slots for shop ${shop.name}:`, e);
+          console.warn(`Failed to fetch live slots for shop ${shop.name}:`, e);
         }
       })
     );
 
+    // Update real metrics
     updateTotalOpenings();
     renderFeed();
 
     // Auto-select first available slot for instant booking
     autoSelectFirstOpenSlot();
 
-    // Re-join socket rooms
+    // Re-join real-time socket rooms for all active shops
     if (socket && socket.connected) {
       allShops.forEach((s) => socket.emit('join_shop', s.id));
     }
@@ -621,9 +499,14 @@ async function fetchShops() {
     if (statsStudiosActive) {
       statsStudiosActive.textContent = allShops.length;
     }
+
+    if (livePulseDot) {
+      livePulseDot.style.background = '#34D399';
+      livePulseDot.style.boxShadow = '0 0 10px #10B981';
+    }
   } catch (err) {
-    console.warn('[Slotify Live] API connection unavailable, activating Real-World Live Network Feed:', err.message);
-    loadRealWorldLiveFeed();
+    console.warn('[Slotify Live] Backend connection unavailable:', err.message);
+    renderBackendOfflineState(err.message);
   }
 }
 
@@ -642,6 +525,9 @@ function updateTotalOpenings() {
 
   if (totalOpeningsCount) totalOpeningsCount.textContent = count;
   if (studiosOnlineCount) studiosOnlineCount.textContent = onlineStudios;
+  if (liveHeaderText) {
+    liveHeaderText.innerHTML = `LIVE NEAR INDORE • <span id="total-openings-count">${count}</span> OPENINGS`;
+  }
 }
 
 function autoSelectFirstOpenSlot() {
@@ -1024,7 +910,8 @@ async function cancelBooking(bookingId, shopId, slotId) {
     });
 
     if (!res.ok) {
-      console.warn('Backend cancel returned non-200, updating locally');
+      const errJson = await res.json().catch(() => ({}));
+      throw new Error(errJson.error || `Cancel failed on server (HTTP ${res.status})`);
     }
 
     // Remove from local storage
@@ -1042,15 +929,11 @@ async function cancelBooking(bookingId, shopId, slotId) {
     }
 
     renderBookingsFeed();
-    showToast('Reservation cancelled. Slot is now reopened.', 'info');
+    showToast('Reservation cancelled. Slot is now reopened live.', 'info');
     addNotification('Reservation cancelled. Opening reopened live.', 'info');
   } catch (err) {
     console.error('Error cancelling booking:', err);
-    // Remove locally anyway
-    const bookings = loadBookings().filter((b) => b.id !== bookingId);
-    saveBookings(bookings);
-    renderBookingsFeed();
-    showToast('Reservation cancelled locally.', 'info');
+    showToast(err.message || 'Could not cancel reservation on backend.', 'error');
   }
 }
 
@@ -1075,39 +958,23 @@ if (sheetReserveForm) {
       submitBtn.disabled = true;
       submitBtn.textContent = 'Broadcasting to Studio...';
 
-      try {
-        // 1. Try public customer booking route POST /shops/:id/book
-        let res = await fetch(`${API_BASE_URL}/shops/${selectedShop.id}/book`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            slotId: selectedSlot.id,
-            customerName: name,
-            customerPhone: phone,
-          }),
-        });
+      // Send live customer booking reservation to backend PostgreSQL API
+      const res = await fetch(`${API_BASE_URL}/shops/${selectedShop.id}/book`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          slotId: selectedSlot.id,
+          customerName: name,
+          customerPhone: phone,
+        }),
+      });
 
-        // 2. Fallback to PATCH if POST was not supported
-        if (!res.ok && res.status === 404) {
-          res = await fetch(`${API_BASE_URL}/shops/${selectedShop.id}/slots`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              slotIds: [selectedSlot.id],
-              status: 'booked',
-              customerName: `${name} (${phone})`,
-            }),
-          });
-        }
-
+      if (!res.ok) {
         if (res.status === 409) {
           throw new Error('This slot was just booked by another customer. Please choose another opening.');
         }
-      } catch (networkErr) {
-        if (networkErr.message && networkErr.message.includes('another customer')) {
-          throw networkErr;
-        }
-        console.warn('[Slotify Live] Synced booking via local real-world layer');
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson.error || `Failed to reserve slot (HTTP ${res.status})`);
       }
 
       // Update local state
