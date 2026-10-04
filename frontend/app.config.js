@@ -21,9 +21,19 @@ module.exports = {
     web: {
       favicon: './assets/favicon.png',
     },
-    plugins: ['expo-secure-store'],
+    plugins: [
+      'expo-secure-store',
+      [
+        'expo-speech-recognition',
+        {
+          microphonePermission: 'Allow Slotify to use the microphone for voice bookings.',
+          speechRecognitionPermission: 'Allow Slotify to convert your voice to text for booking appointments.',
+          androidSpeechServicePackages: ['com.google.android.googlequicksearchbox'],
+        },
+      ],
+    ],
     extra: {
-      apiUrl: process.env.EXPO_PUBLIC_API_URL || 'http://localhost:5000',
+      apiUrl: process.env.EXPO_PUBLIC_API_URL || 'https://slotify-production-937f.up.railway.app',
       eas: {
         projectId: '1ad55b55-2d76-4691-8b02-4ba62b54eca9',
       },

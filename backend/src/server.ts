@@ -89,7 +89,7 @@ async function startServer() {
       console.log(`===============================================`);
       console.log(`🚀 Slotify Express API running on port ${PORT}`);
       console.log(`📡 Socket.io attached and ready on port ${PORT}`);
-      console.log(`👉 Health check: http://localhost:${PORT}/health`);
+      console.log(`👉 Health check: /health`);
       console.log(`===============================================`);
     });
   } catch (error) {

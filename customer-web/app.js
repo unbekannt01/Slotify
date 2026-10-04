@@ -11,18 +11,11 @@ const API_BASE_URL = (() => {
   if (typeof window !== 'undefined' && window.__SLOTIFY_API_URL__) {
     return window.__SLOTIFY_API_URL__;
   }
-  // If explicitly testing with a local server: ?local=true
-  if (
-    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') &&
-    urlParams.get('local') === 'true'
-  ) {
-    return 'http://localhost:5000';
-  }
   // If served directly on Railway
   if (window.location.origin && window.location.origin.includes('railway.app')) {
     return window.location.origin;
   }
-  // Production live backend for Vercel, web, mobile & external visitors
+  // Production live backend for Vercel, mobile web & external visitors
   return RAILWAY_BACKEND_URL;
 })();
 

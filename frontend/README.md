@@ -49,13 +49,12 @@ On the login screen, single-tap preset buttons let you test both roles immediate
 Copy `.env.example` to `.env`:
 
 ```bash
-EXPO_PUBLIC_API_URL=http://localhost:5000
+EXPO_PUBLIC_API_URL=https://slotify-production-937f.up.railway.app
 ```
 
-> **Note for Android Emulators / Physical Devices**:
-> - Android Emulator: use `http://10.0.2.2:5000`
-> - Physical device on Wi-Fi: use your computer's local IP (e.g. `http://192.168.1.X:5000`)
-> - Web / iOS Simulator: `http://localhost:5000`
+> **Live Backend Parity**:
+> - Deployed Railway API: `https://slotify-production-937f.up.railway.app`
+> - Connects automatically for Web, iOS, and Android mobile builds without any configuration required.
 
 ---
 

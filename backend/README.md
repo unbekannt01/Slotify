@@ -27,7 +27,8 @@ cp .env.example .env
 |---|---|---|
 | `PORT` | `5000` | HTTP & Socket.io server port |
 | `NODE_ENV` | `development` | Runtime environment (`development` / `production`) |
-| `DB_HOST` | `localhost` | PostgreSQL host |
+| `DATABASE_URL` | `postgresql://...` | Full PostgreSQL connection string (Railway) |
+| `DB_HOST` | `postgres` | PostgreSQL host |
 | `DB_PORT` | `5432` | PostgreSQL port |
 | `DB_USERNAME` | `postgres` | PostgreSQL username |
 | `DB_PASSWORD` | `""` | PostgreSQL password |
@@ -59,13 +60,13 @@ npm run migration:run
 npm run seed
 ```
 
-### 4. Start Development Server
+### 4. Start Server
 ```bash
 npm run dev
 ```
 
-The server starts on `http://localhost:5000` with Socket.io listening on the same port.
-Health check: `GET http://localhost:5000/health`.
+The server starts and serves HTTP and Socket.io.
+Health check: `GET /health` (or `https://slotify-production-937f.up.railway.app/health` in production).
 
 ### 5. Production Build
 ```bash
