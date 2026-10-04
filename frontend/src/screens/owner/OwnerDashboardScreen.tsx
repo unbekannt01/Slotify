@@ -23,6 +23,7 @@ import { ServicePillRail } from '../../components/ServicePillRail';
 import { PeriodSegmentedTimeline } from '../../components/PeriodSegmentedTimeline';
 import { SlotInspectorModal } from '../../components/SlotInspectorModal';
 import { FloatingActionDock } from '../../components/FloatingActionDock';
+import { VoiceBookingAssistantModal } from '../../components/VoiceBookingAssistantModal';
 import { useAuth } from '../../context/AuthContext';
 import {
   getShopStatusApi,
@@ -43,6 +44,7 @@ export const OwnerDashboardScreen: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [hoursModalVisible, setHoursModalVisible] = useState<boolean>(false);
+  const [voiceModalVisible, setVoiceModalVisible] = useState<boolean>(false);
   const [inspectSlot, setInspectSlot] = useState<SlotItem | null>(null);
   const [actionNotice, setActionNotice] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'smart' | 'extruded'>('smart');
@@ -89,6 +91,27 @@ export const OwnerDashboardScreen: React.FC = () => {
   const showTemporaryNotice = (msg: string) => {
     setActionNotice(msg);
     setTimeout(() => setActionNotice(null), 3500);
+  };
+
+  const handleVoiceBookingSuccess = (bookedSlot: SlotItem, updatedSlots?: SlotItem[]) => {
+    if (updatedSlots && shopData) {
+      const available = updatedSlots.filter((s) => s.status === 'available').length;
+      const booked = updatedSlots.filter((s) => s.status === 'booked').length;
+      const closed = updatedSlots.filter((s) => s.status === 'closed').length;
+      setShopData({
+        ...shopData,
+        slots: updatedSlots,
+        counts: {
+          ...shopData.counts,
+          available,
+          booked,
+          closed,
+        },
+      });
+    } else {
+      fetchShop();
+    }
+    showTemporaryNotice(`✓ Voice booking: ${bookedSlot.customerName || 'Client'} at ${bookedSlot.start}!`);
   };
 
   // 1. Slot duration change
@@ -243,6 +266,14 @@ export const OwnerDashboardScreen: React.FC = () => {
 
           <View style={styles.headerRightActions}>
             <TouchableOpacity
+              style={styles.voiceBtn}
+              onPress={() => setVoiceModalVisible(true)}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.voiceBtnText}>🎙️ Voice Booking</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
               style={styles.hoursBtn}
               onPress={() => setHoursModalVisible(true)}
               activeOpacity={0.8}
@@ -387,6 +418,7 @@ export const OwnerDashboardScreen: React.FC = () => {
         onOpenAll={handleOpenAll}
         onEditHours={() => setHoursModalVisible(true)}
         onLogout={logout}
+        onOpenVoice={() => setVoiceModalVisible(true)}
         onShowQuickMenu={() => showTemporaryNotice(`Shop status: ${status.toUpperCase()} (${counts.available} open)`)}
       />
 
@@ -406,6 +438,16 @@ export const OwnerDashboardScreen: React.FC = () => {
         onSave={handleWorkingHoursSave}
         onClose={() => setHoursModalVisible(false)}
       />
+
+      {/* Intelligent Voice Assistant Modal */}
+      {shopId && (
+        <VoiceBookingAssistantModal
+          visible={voiceModalVisible}
+          shopId={shopId}
+          onClose={() => setVoiceModalVisible(false)}
+          onBookingSuccess={handleVoiceBookingSuccess}
+        />
+      )}
     </View>
   );
 };
@@ -479,6 +521,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+  },
+  voiceBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#6366F1',
+    paddingHorizontal: 11,
+    paddingVertical: 7,
+    borderRadius: 12,
+    borderWidth: 1.2,
+    borderColor: 'rgba(255, 255, 255, 0.25)',
+    shadowColor: '#6366F1',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.45,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  voiceBtnText: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    letterSpacing: 0.2,
   },
   hoursBtn: {
     backgroundColor: 'rgba(255, 255, 255, 0.08)',

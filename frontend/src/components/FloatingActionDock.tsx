@@ -7,6 +7,7 @@ interface FloatingActionDockProps {
   onOpenAll: () => void;
   onEditHours: () => void;
   onLogout: () => void;
+  onOpenVoice?: () => void;
   onShowQuickMenu?: () => void;
 }
 
@@ -15,6 +16,7 @@ export const FloatingActionDock: React.FC<FloatingActionDockProps> = ({
   onOpenAll,
   onEditHours,
   onLogout,
+  onOpenVoice,
   onShowQuickMenu,
 }) => {
   return (
@@ -26,10 +28,10 @@ export const FloatingActionDock: React.FC<FloatingActionDockProps> = ({
           <Text style={styles.dockLabel}>Break</Text>
         </TouchableOpacity>
 
-        {/* Edit Operating Hours */}
-        <TouchableOpacity style={styles.dockItem} onPress={onEditHours} activeOpacity={0.7}>
-          <Text style={styles.dockIcon}>🕒</Text>
-          <Text style={styles.dockLabel}>Hours</Text>
+        {/* Voice Assistant Button */}
+        <TouchableOpacity style={styles.dockItem} onPress={onOpenVoice || onShowQuickMenu} activeOpacity={0.7}>
+          <Text style={styles.dockIcon}>🎙️</Text>
+          <Text style={[styles.dockLabel, { color: '#818CF8' }]}>Voice</Text>
         </TouchableOpacity>
 
         {/* Center Prominent Glowing Action Button (Image 1, 2) */}
@@ -43,14 +45,10 @@ export const FloatingActionDock: React.FC<FloatingActionDockProps> = ({
           <Text style={styles.centerFabText}>OPEN ALL</Text>
         </TouchableOpacity>
 
-        {/* Quick Preview or Menu */}
-        <TouchableOpacity
-          style={styles.dockItem}
-          onPress={onShowQuickMenu || onOpenAll}
-          activeOpacity={0.7}
-        >
-          <Text style={styles.dockIcon}>📊</Text>
-          <Text style={styles.dockLabel}>Status</Text>
+        {/* Edit Operating Hours */}
+        <TouchableOpacity style={styles.dockItem} onPress={onEditHours} activeOpacity={0.7}>
+          <Text style={styles.dockIcon}>🕒</Text>
+          <Text style={styles.dockLabel}>Hours</Text>
         </TouchableOpacity>
 
         {/* Logout */}

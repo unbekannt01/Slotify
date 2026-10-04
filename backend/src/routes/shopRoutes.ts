@@ -6,6 +6,7 @@ import {
   cancelShopBooking,
   updateShopSettings,
   updateShopSlots,
+  handleVoiceAssistantCommand,
 } from '../controllers/shopController';
 import { authMiddleware } from '../middleware/authMiddleware';
 import { requireRole } from '../middleware/requireRole';
@@ -32,6 +33,14 @@ router.patch(
   authMiddleware,
   requireRole('owner', 'admin'),
   updateShopSlots
+);
+
+// Voice Assistant route for shop owners
+router.post(
+  '/:id/voice-assistant',
+  authMiddleware,
+  requireRole('owner', 'admin'),
+  handleVoiceAssistantCommand
 );
 
 export default router;

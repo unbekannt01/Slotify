@@ -9,6 +9,7 @@ import {
   timeToMinutes,
   getTodayDateString,
 } from '../services/slotService';
+import { processVoiceCommand } from '../services/voiceAssistantService';
 import { broadcastToShop } from '../sockets';
 
 export async function getPublicShops(req: Request, res: Response): Promise<void> {
@@ -464,4 +465,89 @@ export async function cancelShopBooking(req: Request, res: Response): Promise<vo
     res.status(500).json({ error: 'Failed to cancel booking' });
   }
 }
+
+/**
+ * Intelligent Voice Assistant Command Handler
+ * Understands Hindi, Gujarati, English, Hinglish, Gujlish voice requests
+ * and books/cancels/checks slots directly in the PostgreSQL database.
+ */
+export async function handleVoiceAssistantCommand(req: Request, res: Response): Promise<void> {
+  try {
+    const id = req.params.id as string;
+    const { text, context, confirm } = req.body;
+
+    if (!text && !confirm) {
+      res.status(400).json({ error: 'Voice command text is required' });
+      return;
+    }
+
+    if (req.user && req.user.role !== 'admin' && req.user.shopId !== id) {
+      res.status(403).json({ error: 'Forbidden: You do not manage this shop' });
+      return;
+    }
+
+    const shopRepo = AppDataSource.getRepository(Shop);
+    const shop = await shopRepo.findOne({ where: { id } });
+
+    if (!shop) {
+      res.status(404).json({ error: 'Shop not found' });
+      return;
+    }
+
+    const shopDayRepo = AppDataSource.getRepository(ShopDay);
+    const todayDay = await getOrCreateTodayShopDay(shop);
+
+    const result = await processVoiceCommand(
+      text || '',
+      shop,
+      todayDay,
+      context,
+      confirm === true
+    );
+
+    // If an action was executed (booked or cancelled), persist to database & broadcast live
+    if ((result.status === 'booked' || result.status === 'cancelled') && result.updatedSlots) {
+      todayDay.slots = result.updatedSlots;
+      await shopDayRepo.save(todayDay);
+
+      const live = computeLiveStatus(shop, todayDay.slots);
+      const broadcastPayload = {
+        shop: {
+          id: shop.id,
+          name: shop.name,
+          category: shop.category,
+          area: shop.area,
+          phone: shop.phone,
+          workingHoursStart: shop.workingHoursStart,
+          workingHoursEnd: shop.workingHoursEnd,
+          slotDurationMinutes: shop.slotDurationMinutes,
+        },
+        status: live.status,
+        currentSlot: live.currentSlot,
+        nextAvailableSlot: live.nextAvailableSlot,
+        counts: {
+          available: live.availableCount,
+          booked: live.bookedCount,
+          closed: live.closedCount,
+          total: todayDay.slots.length,
+        },
+        todayDate: todayDay.date,
+        slots: todayDay.slots,
+      };
+
+      broadcastToShop(shop.id, 'shop_updated', broadcastPayload);
+      broadcastToShop(shop.id, 'slot_changed', {
+        shopId: shop.id,
+        slots: todayDay.slots,
+        status: live.status,
+      });
+    }
+
+    res.json(result);
+  } catch (error: any) {
+    console.error('Error handling voice command:', error);
+    res.status(500).json({ error: 'Failed to process voice command', details: error.message });
+  }
+}
+
 

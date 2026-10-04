@@ -83,10 +83,43 @@ export async function updateShopSlotsApi(
     customerName?: string;
     action?: 'close_break' | 'close_rest_of_today' | 'open_all';
   }
-
 ): Promise<ShopStatusResponse> {
   const response = await apiClient.patch<ShopStatusResponse>(
     `/shops/${shopId}/slots`,
+    payload
+  );
+  return response.data;
+}
+
+export interface VoiceAssistantResponse {
+  success: boolean;
+  status: 'booked' | 'cancelled' | 'confirming' | 'need_info' | 'info' | 'error';
+  intent: 'book_slot' | 'cancel_slot' | 'check_availability' | 'get_schedule' | 'confirm' | 'reject' | 'unknown';
+  replyText: string;
+  language: 'hi' | 'gu' | 'en';
+  extracted?: {
+    customerName?: string;
+    time?: string;
+    date?: string;
+    slotId?: string;
+  };
+  bookedSlot?: SlotItem;
+  cancelledSlot?: SlotItem;
+  proposedSlot?: SlotItem;
+  context?: any;
+  updatedSlots?: SlotItem[];
+}
+
+export async function sendVoiceCommandApi(
+  shopId: string,
+  payload: {
+    text: string;
+    context?: any;
+    confirm?: boolean;
+  }
+): Promise<VoiceAssistantResponse> {
+  const response = await apiClient.post<VoiceAssistantResponse>(
+    `/shops/${shopId}/voice-assistant`,
     payload
   );
   return response.data;
