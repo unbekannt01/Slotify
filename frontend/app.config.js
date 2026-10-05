@@ -22,6 +22,7 @@ module.exports = {
       favicon: './assets/favicon.png',
     },
     plugins: [
+      'expo-font',
       'expo-secure-store',
       [
         'expo-speech-recognition',
