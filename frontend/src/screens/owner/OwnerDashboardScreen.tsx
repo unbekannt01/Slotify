@@ -24,6 +24,7 @@ import { PeriodSegmentedTimeline } from '../../components/PeriodSegmentedTimelin
 import { SlotInspectorModal } from '../../components/SlotInspectorModal';
 import { FloatingActionDock } from '../../components/FloatingActionDock';
 import { VoiceBookingAssistantModal } from '../../components/VoiceBookingAssistantModal';
+import { CounterKioskMode } from '../../components/CounterKioskMode';
 import { useAuth } from '../../context/AuthContext';
 import {
   getShopStatusApi,
@@ -45,6 +46,7 @@ export const OwnerDashboardScreen: React.FC = () => {
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [hoursModalVisible, setHoursModalVisible] = useState<boolean>(false);
   const [voiceModalVisible, setVoiceModalVisible] = useState<boolean>(false);
+  const [kioskModalVisible, setKioskModalVisible] = useState<boolean>(false);
   const [inspectSlot, setInspectSlot] = useState<SlotItem | null>(null);
   const [actionNotice, setActionNotice] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'smart' | 'extruded'>('smart');
@@ -266,11 +268,20 @@ export const OwnerDashboardScreen: React.FC = () => {
 
           <View style={styles.headerRightActions}>
             <TouchableOpacity
+              style={styles.kioskBtn}
+              onPress={() => setKioskModalVisible(true)}
+              activeOpacity={0.8}
+            >
+              <View style={styles.kioskLiveDot} />
+              <Text style={styles.kioskBtnText}>Kiosk (Hands-Free)</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
               style={styles.voiceBtn}
               onPress={() => setVoiceModalVisible(true)}
               activeOpacity={0.8}
             >
-              <Text style={styles.voiceBtnText}>🎙️ Voice Booking</Text>
+              <Text style={styles.voiceBtnText}>🎙️ Voice</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -419,6 +430,7 @@ export const OwnerDashboardScreen: React.FC = () => {
         onEditHours={() => setHoursModalVisible(true)}
         onLogout={logout}
         onOpenVoice={() => setVoiceModalVisible(true)}
+        onOpenCounterKiosk={() => setKioskModalVisible(true)}
         onShowQuickMenu={() => showTemporaryNotice(`Shop status: ${status.toUpperCase()} (${counts.available} open)`)}
       />
 
@@ -446,6 +458,25 @@ export const OwnerDashboardScreen: React.FC = () => {
           shopId={shopId}
           onClose={() => setVoiceModalVisible(false)}
           onBookingSuccess={handleVoiceBookingSuccess}
+        />
+      )}
+
+      {/* 100% Hands-Free Ambient Counter Kiosk Mode */}
+      {shopId && (
+        <CounterKioskMode
+          visible={kioskModalVisible}
+          shopId={shopId}
+          shopName={shop.name}
+          category={shop.category}
+          workingHoursStart={shop.workingHoursStart}
+          workingHoursEnd={shop.workingHoursEnd}
+          slots={shopData.slots}
+          counts={shopData.counts}
+          onClose={() => setKioskModalVisible(false)}
+          onSlotUpdated={(bookedSlot, updatedSlots) => {
+            handleVoiceBookingSuccess(bookedSlot, updatedSlots);
+            showTemporaryNotice(`Kiosk Updated: Slot ${bookedSlot.start || ''} confirmed!`);
+          }}
         />
       )}
     </View>
@@ -521,6 +552,34 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+  },
+  kioskBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(16, 185, 129, 0.16)',
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    borderRadius: 12,
+    borderWidth: 1.2,
+    borderColor: '#10B981',
+    gap: 5,
+    shadowColor: '#10B981',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.35,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  kioskLiveDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#34D399',
+  },
+  kioskBtnText: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#34D399',
+    letterSpacing: 0.2,
   },
   voiceBtn: {
     flexDirection: 'row',

@@ -8,6 +8,7 @@ interface FloatingActionDockProps {
   onEditHours: () => void;
   onLogout: () => void;
   onOpenVoice?: () => void;
+  onOpenCounterKiosk?: () => void;
   onShowQuickMenu?: () => void;
 }
 
@@ -17,6 +18,7 @@ export const FloatingActionDock: React.FC<FloatingActionDockProps> = ({
   onEditHours,
   onLogout,
   onOpenVoice,
+  onOpenCounterKiosk,
   onShowQuickMenu,
 }) => {
   return (
@@ -29,7 +31,12 @@ export const FloatingActionDock: React.FC<FloatingActionDockProps> = ({
         </TouchableOpacity>
 
         {/* Voice Assistant Button */}
-        <TouchableOpacity style={styles.dockItem} onPress={onOpenVoice || onShowQuickMenu} activeOpacity={0.7}>
+        <TouchableOpacity
+          style={styles.dockItem}
+          onPress={onOpenVoice || onShowQuickMenu}
+          onLongPress={onOpenCounterKiosk}
+          activeOpacity={0.7}
+        >
           <Text style={styles.dockIcon}>🎙️</Text>
           <Text style={[styles.dockLabel, { color: '#818CF8' }]}>Voice</Text>
         </TouchableOpacity>

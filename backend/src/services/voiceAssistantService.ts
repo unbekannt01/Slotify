@@ -173,7 +173,8 @@ export function extractCustomerName(text: string): string | null {
     'am', 'pm', 'baje', 'vagye', 'vage', 'subah', 'sham', 'shaam', 'sanje', 'savare',
     'bapore', 'dopahar', 'hai', 'chhe', 'please', 'ek', 'one', 'naame', 'name', 'se',
     'appointment', 'schedule', 'cancel', 'check', 'ha', 'haan', 'yes', 'no', 'nahi',
-    'available', 'open', 'close', 'karvu', 'karva', 'mate'
+    'available', 'open', 'close', 'karvu', 'karva', 'mate',
+    'slotify', 'hey', 'suno', 'hello', 'ok', 'okay', 'theek', 'thik'
   ]);
 
   // Pattern 1: Gujarati "<Name> nu" or "<Name> mate" (e.g. "Raj nu 8:15 nu slot", "Amit mate")
@@ -303,7 +304,34 @@ export async function processVoiceCommand(
   context?: VoiceCommandContext,
   explicitConfirm = false
 ): Promise<VoiceAssistantResult> {
-  const cleanText = (text || '').trim();
+  let cleanText = (text || '').trim();
+  const rawLower = cleanText.toLowerCase();
+
+  // Strip common wake words like "Hey Slotify", "Hi Slotify", "Slotify", "Suno Slotify", "OK Slotify"
+  const strippedText = cleanText.replace(/^(?:hey|hi|ok|okay|suno|listen)?\s*slotify[,:\s]*/i, '').trim();
+  
+  // If owner only said "Hey Slotify" / "Slotify", respond warmly and invite the command!
+  if (!strippedText && rawLower.includes('slotify')) {
+    const lang = detectLanguage(cleanText);
+    const replyText =
+      lang === 'gu'
+        ? 'Ha boliye, hu sambhlu chhu! Shu book karvu chhe?'
+        : lang === 'hi'
+        ? 'Haan ji boliye, main sun raha hoon! Kaunsa slot book karna hai?'
+        : 'Yes, I am listening! Which slot would you like to book or check?';
+    return {
+      success: true,
+      status: 'info',
+      intent: 'unknown',
+      replyText,
+      language: lang,
+    };
+  }
+
+  if (strippedText) {
+    cleanText = strippedText;
+  }
+
   const lang = detectLanguage(cleanText);
   const lower = cleanText.toLowerCase();
 
@@ -313,13 +341,28 @@ export async function processVoiceCommand(
     lower === 'ha' ||
     lower === 'yes' ||
     lower === 'confirm' ||
+    lower === 'ok' ||
+    lower === 'okay' ||
+    lower === 'done' ||
+    lower === 'thik hai' ||
+    lower === 'theek hai' ||
+    lower === 'kar do' ||
+    lower === 'kar de' ||
+    lower === 'sahi hai' ||
+    lower === 'bilkul' ||
+    lower === 'chalega' ||
     lower === 'book kar do' ||
     lower === 'kari do' ||
     lower === 'kari aapo' ||
     lower === 'book it' ||
     lower.startsWith('haan ') ||
     lower.startsWith('ha ') ||
-    lower.startsWith('yes ');
+    lower.startsWith('yes ') ||
+    lower.startsWith('ok ') ||
+    lower.startsWith('okay ') ||
+    lower.startsWith('theek hai') ||
+    lower.startsWith('thik hai') ||
+    lower.startsWith('kar do');
 
   const isNegative =
     lower === 'nahi' ||
