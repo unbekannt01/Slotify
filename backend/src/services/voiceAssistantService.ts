@@ -92,9 +92,9 @@ export function extractTime(text: string): { timeStr: string | null; isExplicitP
   const lower = text.toLowerCase();
   let period: 'am' | 'pm' | undefined = undefined;
 
-  // Period keywords in Hindi / Gujarati / English
+  // Period keywords in Hindi / Gujarati / English (strictly match standalone words)
   if (
-    lower.includes('am') ||
+    /\b(?:am|a\.m\.)\b/i.test(lower) ||
     lower.includes('subah') ||
     lower.includes('savare') ||
     lower.includes('savaare') ||
@@ -102,7 +102,7 @@ export function extractTime(text: string): { timeStr: string | null; isExplicitP
   ) {
     period = 'am';
   } else if (
-    lower.includes('pm') ||
+    /\b(?:pm|p\.m\.)\b/i.test(lower) ||
     lower.includes('sham') ||
     lower.includes('shaam') ||
     lower.includes('sanje') ||
@@ -127,6 +127,9 @@ export function extractTime(text: string): { timeStr: string | null; isExplicitP
       hour += 12;
     } else if (period === 'am' && hour === 12) {
       hour = 0;
+    } else if (!period && hour >= 1 && hour <= 7) {
+      // Business hours: 1 to 7 without period is afternoon/evening (e.g. 4:15 PM)
+      hour += 12;
     }
 
     const padH = hour < 10 ? `0${hour}` : `${hour}`;
@@ -146,6 +149,9 @@ export function extractTime(text: string): { timeStr: string | null; isExplicitP
         hour += 12;
       } else if (period === 'am' && hour === 12) {
         hour = 0;
+      } else if (!period && hour >= 1 && hour <= 7) {
+        // Business hours: 1 to 7 without period is afternoon/evening (e.g. 4 baje = 16:00)
+        hour += 12;
       }
 
       const padH = hour < 10 ? `0${hour}` : `${hour}`;
