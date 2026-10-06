@@ -41,7 +41,7 @@ export const FloatingActionDock: React.FC<FloatingActionDockProps> = ({
           <Text style={[styles.dockLabel, { color: '#818CF8' }]}>Voice</Text>
         </TouchableOpacity>
 
-        {/* Center Prominent Glowing Action Button (Image 1, 2) */}
+        {/* Center Prominent Glowing Action Button */}
         <TouchableOpacity
           style={styles.centerFab}
           onPress={onOpenAll}
@@ -71,9 +71,9 @@ export const FloatingActionDock: React.FC<FloatingActionDockProps> = ({
 const styles = StyleSheet.create({
   dockWrapper: {
     position: 'absolute',
-    bottom: 18,
-    left: 20,
-    right: 20,
+    bottom: 20,
+    left: 18,
+    right: 18,
     alignItems: 'center',
     zIndex: 99,
   },
@@ -82,15 +82,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     width: '100%',
-    height: 66,
-    backgroundColor: 'rgba(18, 24, 38, 0.92)',
-    borderRadius: 33,
+    height: 70,
+    backgroundColor: 'rgba(18, 24, 38, 0.94)',
+    borderRadius: 35,
     paddingHorizontal: 16,
     borderWidth: 1.2,
-    borderColor: 'rgba(255, 255, 255, 0.12)',
+    borderColor: 'rgba(255, 255, 255, 0.15)',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.5,
+    shadowOpacity: 0.55,
     shadowRadius: 20,
     elevation: 12,
   },
@@ -98,20 +98,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingVertical: 6,
   },
   dockIcon: {
-    fontSize: 17,
+    fontSize: 18,
     marginBottom: 2,
   },
   dockLabel: {
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '700',
     color: colors.textSecondary,
   },
   centerFab: {
-    width: 68,
-    height: 52,
+    width: 72,
+    height: 54,
     borderRadius: 22,
     backgroundColor: '#10B981',
     alignItems: 'center',
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
     shadowColor: '#10B981',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.6,
+    shadowOpacity: 0.65,
     shadowRadius: 12,
     elevation: 8,
   },
@@ -132,15 +132,15 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.5)',
   },
   centerFabIcon: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#064E3B',
     fontWeight: '900',
   },
   centerFabText: {
-    fontSize: 8,
+    fontSize: 10,
     fontWeight: '900',
     color: '#064E3B',
-    letterSpacing: 0.5,
+    letterSpacing: 0.6,
     marginTop: 1,
   },
 });

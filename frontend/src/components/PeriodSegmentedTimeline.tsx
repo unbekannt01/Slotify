@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -68,7 +68,6 @@ export const PeriodSegmentedTimeline: React.FC<PeriodSegmentedTimelineProps> = (
     const isNow = isCurrentSlot(slot);
     const duration = getSlotDurationMin(slot);
 
-    // Color bar configs (from Image 6 left vertical color bar)
     const isAvail = slot.status === 'available';
     const isBooked = slot.status === 'booked';
 
@@ -79,22 +78,22 @@ export const PeriodSegmentedTimeline: React.FC<PeriodSegmentedTimelineProps> = (
       : colors.closedGlow;
 
     const bgCard = isAvail
-      ? 'rgba(16, 185, 129, 0.08)'
+      ? 'rgba(16, 185, 129, 0.1)'
       : isBooked
-      ? 'rgba(245, 158, 11, 0.08)'
-      : 'rgba(71, 85, 105, 0.12)';
+      ? 'rgba(245, 158, 11, 0.1)'
+      : 'rgba(71, 85, 105, 0.14)';
 
     const borderColor = isNow
       ? '#FBBF24'
       : isAvail
-      ? 'rgba(16, 185, 129, 0.25)'
+      ? 'rgba(16, 185, 129, 0.3)'
       : isBooked
-      ? 'rgba(245, 158, 11, 0.25)'
-      : 'rgba(255, 255, 255, 0.06)';
+      ? 'rgba(245, 158, 11, 0.3)'
+      : 'rgba(255, 255, 255, 0.08)';
 
     return (
       <View key={slot.id || `slot-${idx}`} style={styles.slotRowWrapper}>
-        {/* Left Time Axis (from Image 6) */}
+        {/* Left Time Axis */}
         <View style={styles.timeAxisCol}>
           <Text style={styles.timeAxisStart}>{slot.start}</Text>
           <View style={styles.axisDotLine} />
@@ -110,7 +109,7 @@ export const PeriodSegmentedTimeline: React.FC<PeriodSegmentedTimelineProps> = (
           onPress={() => handleSlotPress(slot)}
           onLongPress={() => onSelectSlotForInspect && onSelectSlotForInspect(slot)}
         >
-          {/* Vertical Color Strip (Image 6 feature) */}
+          {/* Vertical Color Strip */}
           <View style={[styles.verticalAccentBar, { backgroundColor: barColor }]} />
 
           <View style={styles.slotMainContent}>
@@ -132,17 +131,26 @@ export const PeriodSegmentedTimeline: React.FC<PeriodSegmentedTimelineProps> = (
               </View>
             </View>
 
-            {/* Bottom row: Status badge & hint */}
+            {/* Middle row: Customer name if assigned */}
+            {slot.customerName && (
+              <View style={styles.clientRow}>
+                <Text style={styles.clientText} numberOfLines={1}>
+                  👤 {slot.customerName}
+                </Text>
+              </View>
+            )}
+
+            {/* Bottom row: Status badge & options */}
             <View style={styles.slotBottomRow}>
               <View
                 style={[
                   styles.statusTag,
                   {
                     backgroundColor: isAvail
-                      ? 'rgba(16, 185, 129, 0.16)'
+                      ? 'rgba(16, 185, 129, 0.18)'
                       : isBooked
-                      ? 'rgba(245, 158, 11, 0.16)'
-                      : 'rgba(100, 116, 139, 0.16)',
+                      ? 'rgba(245, 158, 11, 0.18)'
+                      : 'rgba(100, 116, 139, 0.18)',
                   },
                 ]}
               >
@@ -166,7 +174,7 @@ export const PeriodSegmentedTimeline: React.FC<PeriodSegmentedTimelineProps> = (
                         ? colors.availableGlow
                         : isBooked
                         ? colors.busyGlow
-                        : colors.textMuted,
+                        : colors.textSecondary,
                     },
                   ]}
                 >
@@ -176,7 +184,8 @@ export const PeriodSegmentedTimeline: React.FC<PeriodSegmentedTimelineProps> = (
 
               <TouchableOpacity
                 onPress={() => onSelectSlotForInspect && onSelectSlotForInspect(slot)}
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                style={styles.optionsBtn}
               >
                 <Text style={styles.optionsIcon}>•••</Text>
               </TouchableOpacity>
@@ -198,7 +207,7 @@ export const PeriodSegmentedTimeline: React.FC<PeriodSegmentedTimelineProps> = (
 
     return (
       <View style={styles.sectionContainer}>
-        {/* Section Header (Image 5 feature) */}
+        {/* Section Header */}
         <View style={styles.sectionHeader}>
           <View style={styles.sectionTitleRow}>
             <Text style={styles.sectionIcon}>{icon}</Text>
@@ -223,14 +232,14 @@ export const PeriodSegmentedTimeline: React.FC<PeriodSegmentedTimelineProps> = (
     <View style={styles.container}>
       <View style={styles.mainHeader}>
         <View>
-          <Text style={styles.mainTitle}>LIVE AVAILABILITY TIMELINE</Text>
+          <Text style={styles.mainTitle}>LIVE AVAILABILITY SCHEDULE</Text>
           <Text style={styles.mainSubtitle}>
-            Tap any slot to toggle • Long press for details
+            Tap any slot to toggle • Tap ••• or long press for client details
           </Text>
         </View>
       </View>
 
-      {/* Render 3 Smart Periods (Image 5 & 6) */}
+      {/* Render 3 Smart Periods */}
       {renderSection('Morning Slots', '🌅', morningSlots, colors.morningAccent)}
       {renderSection('Afternoon Slots', '☀️', afternoonSlots, colors.afternoonAccent)}
       {renderSection('Evening Slots', '🌙', eveningSlots, colors.eveningAccent)}
@@ -240,7 +249,7 @@ export const PeriodSegmentedTimeline: React.FC<PeriodSegmentedTimelineProps> = (
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 10,
+    marginVertical: 14,
   },
   mainHeader: {
     flexDirection: 'row',
@@ -250,32 +259,33 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   mainTitle: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '800',
     color: colors.textPrimary,
     letterSpacing: 0.8,
   },
   mainSubtitle: {
-    fontSize: 11,
+    fontSize: 12,
     color: colors.textMuted,
-    marginTop: 2,
+    marginTop: 3,
+    lineHeight: 16,
   },
   sectionContainer: {
     marginBottom: 20,
-    backgroundColor: 'rgba(18, 24, 38, 0.5)',
+    backgroundColor: 'rgba(18, 24, 38, 0.65)',
     borderRadius: 22,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.06)',
-    padding: 14,
+    borderWidth: 1.2,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    padding: 16,
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
-    paddingBottom: 8,
+    marginBottom: 14,
+    paddingBottom: 10,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+    borderBottomColor: 'rgba(255, 255, 255, 0.06)',
   },
   sectionTitleRow: {
     flexDirection: 'row',
@@ -283,48 +293,48 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   sectionIcon: {
-    fontSize: 16,
+    fontSize: 18,
   },
   sectionTitle: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '800',
     letterSpacing: 0.6,
     textTransform: 'uppercase',
   },
   sectionBadge: {
-    backgroundColor: 'rgba(255, 255, 255, 0.06)',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
   },
   sectionBadgeText: {
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '700',
     color: colors.textSecondary,
   },
   sectionBody: {
-    gap: 8,
+    gap: 10,
   },
   slotRowWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   timeAxisCol: {
-    width: 44,
+    width: 52,
     alignItems: 'flex-start',
     marginRight: 6,
   },
   timeAxisStart: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: colors.textMuted,
+    fontSize: 13,
+    fontWeight: '800',
+    color: colors.textSecondary,
   },
   axisDotLine: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    marginTop: 4,
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    marginTop: 5,
     marginLeft: 6,
   },
   slotCard: {
@@ -334,18 +344,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     overflow: 'hidden',
-    minHeight: 62,
+    minHeight: 74,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
+    shadowOpacity: 0.25,
+    shadowRadius: 5,
     elevation: 3,
   },
   currentSlotCard: {
-    borderWidth: 1.5,
+    borderWidth: 1.8,
     shadowColor: '#F59E0B',
-    shadowOpacity: 0.4,
-    shadowRadius: 8,
+    shadowOpacity: 0.45,
+    shadowRadius: 10,
   },
   verticalAccentBar: {
     width: 6,
@@ -353,8 +363,8 @@ const styles = StyleSheet.create({
   },
   slotMainContent: {
     flex: 1,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
     justifyContent: 'space-between',
   },
   slotTopRow: {
@@ -365,62 +375,76 @@ const styles = StyleSheet.create({
   timeBadgeContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 8,
   },
   slotTimeText: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '800',
     color: colors.textPrimary,
   },
   nowBadge: {
     backgroundColor: '#F59E0B',
-    paddingHorizontal: 5,
-    paddingVertical: 1,
-    borderRadius: 5,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
   },
   nowText: {
-    fontSize: 8,
+    fontSize: 10,
     fontWeight: '900',
     color: '#000',
+    letterSpacing: 0.5,
   },
   durationPill: {
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    paddingHorizontal: 7,
-    paddingVertical: 2,
+    backgroundColor: 'rgba(255, 255, 255, 0.09)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
     borderRadius: 8,
   },
   durationText: {
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '700',
     color: colors.textSecondary,
+  },
+  clientRow: {
+    marginTop: 4,
+    marginBottom: 2,
+  },
+  clientText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#CBD5E1',
   },
   slotBottomRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 6,
+    marginTop: 8,
   },
   statusTag: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 2.5,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
     borderRadius: 8,
-    gap: 5,
+    gap: 6,
   },
   statusTagDot: {
-    width: 5,
-    height: 5,
-    borderRadius: 2.5,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
   },
   statusTagText: {
-    fontSize: 9,
+    fontSize: 11,
     fontWeight: '800',
-    letterSpacing: 0.4,
+    letterSpacing: 0.5,
+  },
+  optionsBtn: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
   },
   optionsIcon: {
-    fontSize: 14,
-    color: colors.textMuted,
+    fontSize: 16,
+    color: colors.textSecondary,
     fontWeight: '900',
   },
 });

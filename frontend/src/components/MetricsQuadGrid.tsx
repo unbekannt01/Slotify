@@ -26,10 +26,10 @@ export const MetricsQuadGrid: React.FC<MetricsQuadGridProps> = ({
             <Text style={styles.statVal}>{availableCount}</Text>
             {/* Sparkline icon simulation */}
             <View style={styles.sparkline}>
-              <View style={[styles.sparkDot, { backgroundColor: '#A855F7', height: 8 }]} />
-              <View style={[styles.sparkDot, { backgroundColor: '#C084FC', height: 18 }]} />
-              <View style={[styles.sparkDot, { backgroundColor: '#A855F7', height: 12 }]} />
-              <View style={[styles.sparkDot, { backgroundColor: '#E9D5FF', height: 22 }]} />
+              <View style={[styles.sparkDot, { backgroundColor: '#A855F7', height: 10 }]} />
+              <View style={[styles.sparkDot, { backgroundColor: '#C084FC', height: 20 }]} />
+              <View style={[styles.sparkDot, { backgroundColor: '#A855F7', height: 14 }]} />
+              <View style={[styles.sparkDot, { backgroundColor: '#E9D5FF', height: 24 }]} />
             </View>
           </View>
           <View style={styles.cardFooter}>
@@ -43,10 +43,10 @@ export const MetricsQuadGrid: React.FC<MetricsQuadGridProps> = ({
           <View style={styles.cardHeader}>
             <Text style={styles.statVal}>{bookedCount}</Text>
             <View style={styles.sparkline}>
-              <View style={[styles.sparkDot, { backgroundColor: '#F97316', height: 14 }]} />
-              <View style={[styles.sparkDot, { backgroundColor: '#FB923C', height: 10 }]} />
-              <View style={[styles.sparkDot, { backgroundColor: '#FDBA74', height: 20 }]} />
-              <View style={[styles.sparkDot, { backgroundColor: '#EA580C', height: 16 }]} />
+              <View style={[styles.sparkDot, { backgroundColor: '#F97316', height: 16 }]} />
+              <View style={[styles.sparkDot, { backgroundColor: '#FB923C', height: 12 }]} />
+              <View style={[styles.sparkDot, { backgroundColor: '#FDBA74', height: 22 }]} />
+              <View style={[styles.sparkDot, { backgroundColor: '#EA580C', height: 18 }]} />
             </View>
           </View>
           <View style={styles.cardFooter}>
@@ -60,12 +60,15 @@ export const MetricsQuadGrid: React.FC<MetricsQuadGridProps> = ({
         {/* Card 3: Grid Cadence */}
         <View style={[styles.card, styles.cyanCard]}>
           <View style={styles.cardHeader}>
-            <Text style={styles.statVal}>{slotDuration}<Text style={styles.unitText}>m</Text></Text>
+            <Text style={styles.statVal}>
+              {slotDuration}
+              <Text style={styles.unitText}>m</Text>
+            </Text>
             <View style={styles.sparkline}>
-              <View style={[styles.sparkDot, { backgroundColor: '#06B6D4', height: 12 }]} />
-              <View style={[styles.sparkDot, { backgroundColor: '#22D3EE', height: 16 }]} />
-              <View style={[styles.sparkDot, { backgroundColor: '#67E8F9', height: 22 }]} />
-              <View style={[styles.sparkDot, { backgroundColor: '#0891B2', height: 14 }]} />
+              <View style={[styles.sparkDot, { backgroundColor: '#06B6D4', height: 14 }]} />
+              <View style={[styles.sparkDot, { backgroundColor: '#22D3EE', height: 18 }]} />
+              <View style={[styles.sparkDot, { backgroundColor: '#67E8F9', height: 24 }]} />
+              <View style={[styles.sparkDot, { backgroundColor: '#0891B2', height: 16 }]} />
             </View>
           </View>
           <View style={styles.cardFooter}>
@@ -77,12 +80,15 @@ export const MetricsQuadGrid: React.FC<MetricsQuadGridProps> = ({
         {/* Card 4: Occupancy Rate */}
         <View style={[styles.card, styles.greenCard]}>
           <View style={styles.cardHeader}>
-            <Text style={styles.statVal}>{occupancyRate}<Text style={styles.unitText}>%</Text></Text>
+            <Text style={styles.statVal}>
+              {occupancyRate}
+              <Text style={styles.unitText}>%</Text>
+            </Text>
             <View style={styles.sparkline}>
-              <View style={[styles.sparkDot, { backgroundColor: '#10B981', height: 10 }]} />
-              <View style={[styles.sparkDot, { backgroundColor: '#34D399', height: 15 }]} />
-              <View style={[styles.sparkDot, { backgroundColor: '#6EE7B7', height: 19 }]} />
-              <View style={[styles.sparkDot, { backgroundColor: '#059669', height: 24 }]} />
+              <View style={[styles.sparkDot, { backgroundColor: '#10B981', height: 12 }]} />
+              <View style={[styles.sparkDot, { backgroundColor: '#34D399', height: 18 }]} />
+              <View style={[styles.sparkDot, { backgroundColor: '#6EE7B7', height: 22 }]} />
+              <View style={[styles.sparkDot, { backgroundColor: '#059669', height: 26 }]} />
             </View>
           </View>
           <View style={styles.cardFooter}>
@@ -107,26 +113,26 @@ const styles = StyleSheet.create({
   card: {
     flex: 1,
     borderRadius: 20,
-    padding: 14,
-    borderWidth: 1,
+    padding: 16,
+    borderWidth: 1.2,
     justifyContent: 'space-between',
-    minHeight: 96,
+    minHeight: 104,
   },
   purpleCard: {
-    backgroundColor: 'rgba(168, 85, 247, 0.09)',
-    borderColor: 'rgba(168, 85, 247, 0.25)',
+    backgroundColor: 'rgba(168, 85, 247, 0.12)',
+    borderColor: 'rgba(168, 85, 247, 0.3)',
   },
   peachCard: {
-    backgroundColor: 'rgba(249, 115, 22, 0.09)',
-    borderColor: 'rgba(249, 115, 22, 0.25)',
+    backgroundColor: 'rgba(249, 115, 22, 0.12)',
+    borderColor: 'rgba(249, 115, 22, 0.3)',
   },
   cyanCard: {
-    backgroundColor: 'rgba(6, 182, 212, 0.09)',
-    borderColor: 'rgba(6, 182, 212, 0.25)',
+    backgroundColor: 'rgba(6, 182, 212, 0.12)',
+    borderColor: 'rgba(6, 182, 212, 0.3)',
   },
   greenCard: {
-    backgroundColor: 'rgba(16, 185, 129, 0.09)',
-    borderColor: 'rgba(16, 185, 129, 0.25)',
+    backgroundColor: 'rgba(16, 185, 129, 0.12)',
+    borderColor: 'rgba(16, 185, 129, 0.3)',
   },
   cardHeader: {
     flexDirection: 'row',
@@ -134,40 +140,40 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   statVal: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: '900',
     color: colors.textPrimary,
   },
   unitText: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '700',
     color: colors.textSecondary,
   },
   sparkline: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    gap: 3.5,
-    height: 24,
+    gap: 4,
+    height: 26,
   },
   sparkDot: {
-    width: 4,
-    borderRadius: 2,
+    width: 5,
+    borderRadius: 2.5,
   },
   cardFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: 12,
   },
   statLabel: {
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: 13,
+    fontWeight: '700',
     color: colors.textSecondary,
   },
   chevron: {
-    fontSize: 18,
+    fontSize: 20,
     color: colors.textMuted,
     fontWeight: '700',
-    lineHeight: 18,
+    lineHeight: 20,
   },
 });

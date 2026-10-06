@@ -81,8 +81,8 @@ export const FloatingDateStrip: React.FC<FloatingDateStripProps> = ({
               >
                 {item.dayNum}
               </Text>
-              
-              {/* Slot count tag (from Image 5) */}
+
+              {/* Slot count tag */}
               <View
                 style={[
                   styles.slotBadge,
@@ -95,7 +95,7 @@ export const FloatingDateStrip: React.FC<FloatingDateStripProps> = ({
                     isSelected ? styles.selectedSlotText : styles.unselectedSlotText,
                   ]}
                 >
-                  {item.slotCount} slots
+                  {item.slotCount} open
                 </Text>
               </View>
             </TouchableOpacity>
@@ -108,72 +108,73 @@ export const FloatingDateStrip: React.FC<FloatingDateStripProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 10,
-    backgroundColor: 'rgba(18, 24, 38, 0.65)',
+    marginVertical: 12,
+    backgroundColor: 'rgba(18, 24, 38, 0.75)',
     borderRadius: 22,
-    borderWidth: 1,
+    borderWidth: 1.2,
     borderColor: 'rgba(255, 255, 255, 0.08)',
-    padding: 14,
+    padding: 16,
   },
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 14,
   },
   monthBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 8,
   },
   calendarIcon: {
-    fontSize: 14,
+    fontSize: 16,
   },
   monthText: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '800',
     color: colors.textPrimary,
     letterSpacing: 0.5,
   },
   todayHint: {
-    fontSize: 11,
+    fontSize: 12,
     color: colors.textMuted,
     fontWeight: '600',
   },
   stripContent: {
     flexDirection: 'row',
-    gap: 8,
+    gap: 10,
     paddingVertical: 2,
   },
   datePill: {
-    width: 66,
-    height: 84,
+    width: 74,
+    height: 94,
     borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 8,
-    borderWidth: 1,
+    paddingVertical: 10,
+    borderWidth: 1.2,
   },
   unselectedPill: {
-    backgroundColor: 'rgba(255, 255, 255, 0.03)',
-    borderColor: 'rgba(255, 255, 255, 0.06)',
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   selectedPill: {
     backgroundColor: colors.primary,
     borderColor: colors.primaryGlow,
     shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.45,
+    shadowOpacity: 0.5,
     shadowRadius: 10,
     elevation: 6,
   },
   todayIndicatorBorder: {
-    borderColor: 'rgba(99, 102, 241, 0.4)',
+    borderColor: 'rgba(99, 102, 241, 0.5)',
   },
   dayName: {
-    fontSize: 11,
-    fontWeight: '700',
+    fontSize: 12,
+    fontWeight: '800',
     textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   unselectedText: {
     color: colors.textMuted,
@@ -182,7 +183,7 @@ const styles = StyleSheet.create({
     color: '#E0E7FF',
   },
   dayNum: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: '900',
   },
   unselectedNum: {
@@ -192,18 +193,18 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   slotBadge: {
-    paddingHorizontal: 6,
-    paddingVertical: 2,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
     borderRadius: 8,
   },
   unselectedSlotBadge: {
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: 'rgba(255, 255, 255, 0.07)',
   },
   selectedSlotBadge: {
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    backgroundColor: 'rgba(0, 0, 0, 0.35)',
   },
   slotBadgeText: {
-    fontSize: 9,
+    fontSize: 11,
     fontWeight: '800',
   },
   unselectedSlotText: {

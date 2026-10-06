@@ -105,7 +105,7 @@ export const LivePreviewCard: React.FC<LivePreviewCardProps> = ({
       {/* Simulated Customer Page Preview */}
       <View style={styles.customerBox}>
         <View style={styles.shopMetaRow}>
-          <View>
+          <View style={{ flex: 1, marginRight: 10 }}>
             <Text style={styles.shopName}>{shop.name}</Text>
             <Text style={styles.shopCategory}>
               {shop.category} • {shop.area || 'City Center'}
@@ -146,22 +146,23 @@ export const LivePreviewCard: React.FC<LivePreviewCardProps> = ({
           </View>
         )}
 
-        {/* Customer Call to Book CTA */}
-        {shop.phone ? (
+        {/* Phone Call Preview Action */}
+        {shop.phone && (
           <TouchableOpacity
             style={styles.callButton}
             onPress={() => Linking.openURL(`tel:${shop.phone}`)}
+            activeOpacity={0.8}
           >
             <LinearGradient
-              colors={['#6366F1', '#4F46E5']}
+              colors={['#10B981', '#059669']}
               style={styles.callGradient}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
             >
-              <Text style={styles.callButtonText}>📞 Call to Book ({shop.phone})</Text>
+              <Text style={styles.callButtonText}>📞 Call {shop.phone} (Client view)</Text>
             </LinearGradient>
           </TouchableOpacity>
-        ) : null}
+        )}
       </View>
     </View>
   );
@@ -170,19 +171,18 @@ export const LivePreviewCard: React.FC<LivePreviewCardProps> = ({
 const styles = StyleSheet.create({
   cardContainer: {
     marginVertical: 14,
-    borderRadius: 18,
-    backgroundColor: 'rgba(15, 23, 42, 0.75)',
-    borderWidth: 1,
-    borderColor: 'rgba(99, 102, 241, 0.3)',
+    borderRadius: 22,
+    backgroundColor: 'rgba(18, 24, 38, 0.75)',
+    borderWidth: 1.2,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     overflow: 'hidden',
   },
   header: {
+    backgroundColor: 'rgba(14, 19, 31, 0.85)',
     paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 8,
+    paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255, 255, 255, 0.06)',
-    backgroundColor: 'rgba(99, 102, 241, 0.08)',
   },
   badgeRow: {
     flexDirection: 'row',
@@ -192,56 +192,64 @@ const styles = StyleSheet.create({
   liveIndicator: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: 'rgba(56, 189, 248, 0.14)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(56, 189, 248, 0.3)',
   },
   liveDot: {
-    width: 7,
-    height: 7,
-    borderRadius: 3.5,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
     backgroundColor: '#38BDF8',
     marginRight: 6,
   },
   liveText: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: '800',
     color: '#38BDF8',
     letterSpacing: 0.8,
   },
   socketStatus: {
-    fontSize: 10,
+    fontSize: 12,
     color: colors.textMuted,
+    fontWeight: '600',
   },
   previewCaption: {
-    fontSize: 11,
+    fontSize: 12,
     color: colors.textSecondary,
-    marginTop: 4,
+    marginTop: 6,
+    lineHeight: 16,
   },
   customerBox: {
-    padding: 16,
+    padding: 18,
   },
   shopMetaRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 12,
+    marginBottom: 14,
   },
   shopName: {
-    fontSize: 17,
-    fontWeight: '800',
+    fontSize: 19,
+    fontWeight: '900',
     color: colors.textPrimary,
   },
   shopCategory: {
-    fontSize: 12,
+    fontSize: 13,
     color: colors.textSecondary,
-    marginTop: 2,
+    marginTop: 3,
   },
   statusBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 8,
-    borderWidth: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 10,
+    borderWidth: 1.2,
   },
   statusBadgeText: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '800',
     letterSpacing: 0.5,
   },
@@ -249,70 +257,72 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 8,
+    paddingVertical: 10,
     borderTopWidth: 1,
     borderTopColor: 'rgba(255, 255, 255, 0.06)',
-    marginBottom: 10,
+    marginBottom: 12,
   },
   scheduleLabel: {
-    fontSize: 12,
+    fontSize: 13,
     color: colors.textSecondary,
+    fontWeight: '600',
   },
   scheduleTime: {
-    fontSize: 13,
-    fontWeight: '700',
+    fontSize: 14,
+    fontWeight: '800',
     color: colors.textPrimary,
   },
   chipsContainer: {
-    marginBottom: 14,
+    marginBottom: 16,
   },
   chipsLabel: {
-    fontSize: 11,
+    fontSize: 12,
     color: colors.textMuted,
-    marginBottom: 6,
-    fontWeight: '600',
+    marginBottom: 8,
+    fontWeight: '700',
   },
   chipsRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 6,
+    gap: 8,
   },
   slotChip: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 8,
-    backgroundColor: 'rgba(16, 185, 129, 0.15)',
-    borderWidth: 1,
-    borderColor: 'rgba(16, 185, 129, 0.3)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 10,
+    backgroundColor: 'rgba(16, 185, 129, 0.16)',
+    borderWidth: 1.2,
+    borderColor: 'rgba(16, 185, 129, 0.35)',
   },
   slotChipText: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '700',
     color: colors.availableGlow,
   },
   slotChipMore: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
   },
   slotChipMoreText: {
-    fontSize: 11,
+    fontSize: 12,
     color: colors.textSecondary,
+    fontWeight: '600',
   },
   callButton: {
-    borderRadius: 12,
+    borderRadius: 14,
     overflow: 'hidden',
-    marginTop: 4,
+    marginTop: 6,
   },
   callGradient: {
-    paddingVertical: 10,
+    paddingVertical: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
   callButtonText: {
-    fontSize: 13,
-    fontWeight: '700',
+    fontSize: 14,
+    fontWeight: '800',
     color: '#FFF',
   },
 });

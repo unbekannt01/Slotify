@@ -50,12 +50,12 @@ export const SlotInspectorModal: React.FC<SlotInspectorModalProps> = ({
     >
       <Pressable style={styles.backdrop} onPress={onClose}>
         <Pressable style={styles.sheetContainer} onPress={(e) => e.stopPropagation()}>
-          {/* Grab handle indicator (Image 5 & 7) */}
+          {/* Grab handle indicator */}
           <View style={styles.handleBar} />
 
           <View style={styles.sheetHeader}>
             <View>
-              <Text style={styles.sheetTitle}>SLOT INSPECTOR</Text>
+              <Text style={styles.sheetTitle}>SLOT DETAILS & EDIT</Text>
               <Text style={styles.slotRange}>
                 {slot.start} – {slot.end}
               </Text>
@@ -66,8 +66,8 @@ export const SlotInspectorModal: React.FC<SlotInspectorModalProps> = ({
             </TouchableOpacity>
           </View>
 
-          {/* Quick Status Selectors (Image 5 & 7 style) */}
-          <Text style={styles.fieldLabel}>AVAILABILITY STATUS</Text>
+          {/* Quick Status Selectors */}
+          <Text style={styles.fieldLabel}>SLOT STATUS</Text>
           <View style={styles.statusButtonsRow}>
             {/* Available */}
             <TouchableOpacity
@@ -76,6 +76,7 @@ export const SlotInspectorModal: React.FC<SlotInspectorModalProps> = ({
                 selectedStatus === 'available' && styles.availableSelected,
               ]}
               onPress={() => setSelectedStatus('available')}
+              activeOpacity={0.8}
             >
               <View style={[styles.statusOptionDot, { backgroundColor: colors.availableGlow }]} />
               <Text
@@ -95,6 +96,7 @@ export const SlotInspectorModal: React.FC<SlotInspectorModalProps> = ({
                 selectedStatus === 'booked' && styles.bookedSelected,
               ]}
               onPress={() => setSelectedStatus('booked')}
+              activeOpacity={0.8}
             >
               <View style={[styles.statusOptionDot, { backgroundColor: colors.busyGlow }]} />
               <Text
@@ -114,6 +116,7 @@ export const SlotInspectorModal: React.FC<SlotInspectorModalProps> = ({
                 selectedStatus === 'closed' && styles.closedSelected,
               ]}
               onPress={() => setSelectedStatus('closed')}
+              activeOpacity={0.8}
             >
               <View style={[styles.statusOptionDot, { backgroundColor: colors.closedGlow }]} />
               <Text
@@ -127,7 +130,7 @@ export const SlotInspectorModal: React.FC<SlotInspectorModalProps> = ({
             </TouchableOpacity>
           </View>
 
-          {/* Client / Appointment details (Optional) */}
+          {/* Client / Appointment details */}
           <Text style={styles.fieldLabel}>CLIENT NAME / RESERVATION NOTE</Text>
           <TextInput
             style={styles.textInput}
@@ -139,13 +142,12 @@ export const SlotInspectorModal: React.FC<SlotInspectorModalProps> = ({
 
           {/* Action Buttons */}
           <View style={styles.footerActions}>
-            <TouchableOpacity style={styles.cancelBtn} onPress={onClose}>
+            <TouchableOpacity style={styles.cancelBtn} onPress={onClose} activeOpacity={0.8}>
               <Text style={styles.cancelBtnText}>Cancel</Text>
             </TouchableOpacity>
 
-            {/* Vivid emerald CTA (Image 7) */}
-            <TouchableOpacity style={styles.confirmBtn} onPress={handleSave}>
-              <Text style={styles.confirmBtnText}>Save & Broadcast</Text>
+            <TouchableOpacity style={styles.confirmBtn} onPress={handleSave} activeOpacity={0.85}>
+              <Text style={styles.confirmBtnText}>Save & Broadcast →</Text>
             </TouchableOpacity>
           </View>
         </Pressable>
@@ -157,26 +159,26 @@ export const SlotInspectorModal: React.FC<SlotInspectorModalProps> = ({
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.65)',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
     justifyContent: 'flex-end',
   },
   sheetContainer: {
     backgroundColor: '#121826',
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 36,
+    borderWidth: 1.2,
+    borderColor: 'rgba(255, 255, 255, 0.12)',
+    paddingHorizontal: 22,
+    paddingTop: 14,
+    paddingBottom: 38,
   },
   handleBar: {
-    width: 44,
+    width: 48,
     height: 5,
     borderRadius: 3,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
     alignSelf: 'center',
-    marginBottom: 16,
+    marginBottom: 18,
   },
   sheetHeader: {
     flexDirection: 'row',
@@ -185,65 +187,65 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   sheetTitle: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '800',
     color: colors.primaryGlow,
     letterSpacing: 1,
   },
   slotRange: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '900',
     color: colors.textPrimary,
-    marginTop: 2,
+    marginTop: 3,
   },
   closeBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   closeIcon: {
     color: colors.textSecondary,
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '700',
   },
   fieldLabel: {
-    fontSize: 11,
-    fontWeight: '800',
+    fontSize: 12,
+    fontWeight: '700',
     color: colors.textSecondary,
     letterSpacing: 0.8,
     marginBottom: 10,
-    marginTop: 6,
+    marginTop: 8,
   },
   statusButtonsRow: {
     flexDirection: 'row',
     gap: 10,
-    marginBottom: 18,
+    marginBottom: 20,
   },
   statusOptionBtn: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 12,
+    paddingVertical: 14,
     borderRadius: 14,
-    borderWidth: 1,
+    borderWidth: 1.2,
     borderColor: 'rgba(255, 255, 255, 0.08)',
-    backgroundColor: 'rgba(255, 255, 255, 0.03)',
-    gap: 6,
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    gap: 7,
   },
   availableSelected: {
-    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+    backgroundColor: 'rgba(16, 185, 129, 0.16)',
     borderColor: colors.availableGlow,
   },
   bookedSelected: {
-    backgroundColor: 'rgba(245, 158, 11, 0.15)',
+    backgroundColor: 'rgba(245, 158, 11, 0.16)',
     borderColor: colors.busyGlow,
   },
   closedSelected: {
-    backgroundColor: 'rgba(100, 116, 139, 0.2)',
+    backgroundColor: 'rgba(100, 116, 139, 0.22)',
     borderColor: colors.closedGlow,
   },
   statusOptionDot: {
@@ -252,19 +254,20 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   statusOptionText: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '700',
     color: colors.textMuted,
   },
   textInput: {
     backgroundColor: colors.bgInput,
     borderRadius: 14,
-    borderWidth: 1,
+    borderWidth: 1.2,
     borderColor: colors.borderSubtle,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+    height: 52,
+    paddingHorizontal: 16,
     color: colors.textPrimary,
-    fontSize: 13,
+    fontSize: 15,
+    fontWeight: '500',
     marginBottom: 24,
   },
   footerActions: {
@@ -273,32 +276,36 @@ const styles = StyleSheet.create({
   },
   cancelBtn: {
     flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    height: 52,
     borderRadius: 14,
-    paddingVertical: 14,
+    borderWidth: 1.2,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
     alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
   },
   cancelBtnText: {
-    color: colors.textSecondary,
+    fontSize: 15,
     fontWeight: '700',
-    fontSize: 13,
+    color: colors.textSecondary,
   },
   confirmBtn: {
     flex: 2,
-    backgroundColor: '#10B981',
+    height: 52,
     borderRadius: 14,
-    paddingVertical: 14,
+    backgroundColor: colors.primary,
     alignItems: 'center',
-    shadowColor: '#10B981',
+    justifyContent: 'center',
+    shadowColor: colors.primaryGlow,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
+    shadowOpacity: 0.45,
     shadowRadius: 10,
-    elevation: 6,
+    elevation: 4,
   },
   confirmBtnText: {
-    color: '#064E3B',
-    fontWeight: '900',
-    fontSize: 13,
-    letterSpacing: 0.4,
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#FFF',
+    letterSpacing: 0.3,
   },
 });

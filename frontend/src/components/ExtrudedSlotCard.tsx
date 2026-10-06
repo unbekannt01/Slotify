@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   Pressable,
 } from 'react-native';
 import Animated, {
@@ -39,14 +38,13 @@ export const ExtrudedSlotCard: React.FC<ExtrudedSlotCardProps> = ({
   const prevStatusRef = useRef<SlotStatus>(slot.status);
 
   // Animations
-  const rotateX = useSharedValue(0); // 0 to 90deg and back
+  const rotateX = useSharedValue(0);
   const liftY = useSharedValue(0);
 
   // Split-flap flip on status change
   useEffect(() => {
     if (prevStatusRef.current !== slot.status) {
       prevStatusRef.current = slot.status;
-      // Animate flip: 0 -> 90deg down, swap status, 90deg -> 0deg up
       rotateX.value = withSequence(
         withTiming(90, { duration: 160, easing: Easing.in(Easing.quad) }, () => {
           runOnJS(setDisplayedStatus)(slot.status);
@@ -111,7 +109,6 @@ export const ExtrudedSlotCard: React.FC<ExtrudedSlotCardProps> = ({
   const visuals = getStatusVisuals(displayedStatus);
 
   const handlePress = () => {
-    // Cycle: available -> booked -> closed -> available
     let next: SlotStatus = 'available';
     if (slot.status === 'available') next = 'booked';
     else if (slot.status === 'booked') next = 'closed';
@@ -122,7 +119,7 @@ export const ExtrudedSlotCard: React.FC<ExtrudedSlotCardProps> = ({
 
   return (
     <Pressable onPress={handlePress} style={styles.cardContainer}>
-      {/* 3D Extruded bottom layer (fake 3D thickness) */}
+      {/* 3D Extruded bottom layer */}
       <View
         style={[
           styles.extrusionLayer,
@@ -188,7 +185,7 @@ export const ExtrudedSlotCard: React.FC<ExtrudedSlotCardProps> = ({
 
 const styles = StyleSheet.create({
   cardContainer: {
-    height: 76,
+    height: 84,
     marginVertical: 6,
     marginHorizontal: 4,
     position: 'relative',
@@ -198,8 +195,8 @@ const styles = StyleSheet.create({
     top: 5,
     left: 0,
     right: 0,
-    height: 68,
-    borderRadius: 14,
+    height: 74,
+    borderRadius: 16,
     borderWidth: 1,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 6 },
@@ -208,11 +205,11 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   faceLayer: {
-    height: 68,
-    borderRadius: 14,
+    height: 74,
+    borderRadius: 16,
     borderWidth: 1.2,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    paddingHorizontal: 18,
+    paddingVertical: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -233,7 +230,7 @@ const styles = StyleSheet.create({
   },
   flapCrease: {
     position: 'absolute',
-    top: 33,
+    top: 36,
     left: 0,
     right: 0,
     height: 1,
@@ -242,26 +239,26 @@ const styles = StyleSheet.create({
   currentBadge: {
     position: 'absolute',
     top: 6,
-    left: 14,
+    left: 16,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'rgba(245, 158, 11, 0.25)',
-    paddingHorizontal: 6,
-    paddingVertical: 1.5,
+    paddingHorizontal: 7,
+    paddingVertical: 2,
     borderRadius: 6,
     borderWidth: 0.5,
     borderColor: '#F59E0B',
   },
   pulseDot: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
     backgroundColor: '#FBBF24',
     marginRight: 4,
   },
   currentBadgeText: {
-    fontSize: 9,
-    fontWeight: '800',
+    fontSize: 10,
+    fontWeight: '900',
     color: '#FBBF24',
     letterSpacing: 0.5,
   },
@@ -271,33 +268,33 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   timeText: {
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 17,
+    fontWeight: '800',
     color: colors.textPrimary,
     letterSpacing: 0.3,
   },
   timeDash: {
-    fontSize: 14,
+    fontSize: 15,
     color: colors.textMuted,
-    marginHorizontal: 5,
+    marginHorizontal: 6,
   },
   statusPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     borderRadius: 10,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
-    borderWidth: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.35)',
+    borderWidth: 1.2,
   },
   statusDot: {
-    width: 7,
-    height: 7,
-    borderRadius: 3.5,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
     marginRight: 6,
   },
   statusText: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '800',
     letterSpacing: 0.6,
   },

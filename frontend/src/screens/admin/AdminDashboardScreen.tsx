@@ -78,7 +78,7 @@ export const AdminDashboardScreen: React.FC = () => {
   const renderHeader = () => (
     <View style={styles.headerContainer}>
       {/* Top Navbar */}
-      <View style={[styles.navBar, { paddingTop: Math.max(insets.top + 10, 48) }]}>
+      <View style={[styles.navBar, { paddingTop: Math.max(insets.top + 8, 46) }]}>
         <View style={{ flex: 1, marginRight: 10 }}>
           <View style={styles.platformBadgeRow}>
             <View style={styles.platformDot} />
@@ -93,7 +93,7 @@ export const AdminDashboardScreen: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Stats Summary 2x2 Pastel Grid */}
+      {/* Stats Summary 2x2 Grid */}
       {stats && (
         <View style={styles.adminStatsContainer}>
           <Text style={styles.statsTitle}>REAL-TIME PLATFORM METRICS</Text>
@@ -102,7 +102,7 @@ export const AdminDashboardScreen: React.FC = () => {
             <View style={[styles.statQuadCard, styles.purpleQuad]}>
               <View style={styles.statQuadHeader}>
                 <Text style={styles.statVal}>{stats.totalShops}</Text>
-                <Text style={{ fontSize: 16 }}>🏬</Text>
+                <Text style={{ fontSize: 18 }}>🏬</Text>
               </View>
               <Text style={styles.statLbl}>Registered Shops</Text>
             </View>
@@ -113,7 +113,7 @@ export const AdminDashboardScreen: React.FC = () => {
                 <Text style={[styles.statVal, { color: colors.availableGlow }]}>
                   {stats.availableShops}
                 </Text>
-                <Text style={{ fontSize: 16 }}>🟢</Text>
+                <Text style={{ fontSize: 18 }}>🟢</Text>
               </View>
               <Text style={styles.statLbl}>Live & Open Now</Text>
             </View>
@@ -126,7 +126,7 @@ export const AdminDashboardScreen: React.FC = () => {
                 <Text style={[styles.statVal, { color: colors.busyGlow }]}>
                   {stats.busyShops}
                 </Text>
-                <Text style={{ fontSize: 16 }}>🟡</Text>
+                <Text style={{ fontSize: 18 }}>🟡</Text>
               </View>
               <Text style={styles.statLbl}>Busy Studios</Text>
             </View>
@@ -137,7 +137,7 @@ export const AdminDashboardScreen: React.FC = () => {
                 <Text style={[styles.statVal, { color: colors.primaryGlow }]}>
                   {stats.bookedSlotsToday}
                 </Text>
-                <Text style={{ fontSize: 16 }}>⚡</Text>
+                <Text style={{ fontSize: 18 }}>⚡</Text>
               </View>
               <Text style={styles.statLbl}>Booked Today</Text>
             </View>
@@ -180,6 +180,7 @@ export const AdminDashboardScreen: React.FC = () => {
                 isSelected ? styles.categoryChipActive : styles.categoryChipInactive,
               ]}
               onPress={() => setActiveCategory(cat)}
+              activeOpacity={0.8}
             >
               <Text
                 style={[
@@ -196,82 +197,105 @@ export const AdminDashboardScreen: React.FC = () => {
 
       {/* List Sub-header */}
       <View style={styles.listSubHeader}>
-        <Text style={styles.listSubTitle}>PLATFORM SHOPS ({filteredShops.length})</Text>
-        <Text style={styles.listSubHint}>Auto-syncs via Socket.io</Text>
+        <Text style={styles.listSubTitle}>
+          REGISTERED SALONS & STUDIOS ({filteredShops.length})
+        </Text>
+        <Text style={styles.listSubHint}>Tap Edit to configure</Text>
       </View>
     </View>
   );
 
   const renderShopItem = ({ item }: { item: PublicShopItem }) => {
-    const isAvailable = item.status === 'available';
+    const isAvail = item.status === 'available';
     const isBusy = item.status === 'busy';
 
-    const statusColor = isAvailable
-      ? colors.availableGlow
-      : isBusy
-      ? colors.busyGlow
-      : colors.textMuted;
-
-    const statusBg = isAvailable
+    const statusBg = isAvail
       ? colors.availableBg
       : isBusy
       ? colors.busyBg
       : colors.closedBg;
 
-    const occupancy = item.totalSlots > 0
-      ? Math.round((item.bookedCount / item.totalSlots) * 100)
-      : 0;
+    const statusBorder = isAvail
+      ? colors.availableBorder
+      : isBusy
+      ? colors.busyBorder
+      : colors.closedBorder;
+
+    const statusTextCol = isAvail
+      ? colors.availableGlow
+      : isBusy
+      ? colors.busyGlow
+      : colors.textMuted;
+
+    const statusDotCol = isAvail
+      ? colors.availableGlow
+      : isBusy
+      ? colors.busyGlow
+      : colors.closedGlow;
+
+    const occupancy =
+      item.totalSlots > 0
+        ? Math.round((item.bookedCount / item.totalSlots) * 100)
+        : 0;
 
     return (
       <View style={styles.shopCard}>
-        {/* Left vertical color accent rail */}
-        <View
-          style={[
-            styles.shopCardAccentRail,
-            { backgroundColor: statusColor },
-          ]}
-        />
+        {/* Left vertical status rail */}
+        <View style={[styles.shopCardAccentRail, { backgroundColor: statusDotCol }]} />
 
         <View style={styles.shopCardInner}>
           <View style={styles.cardTop}>
-            <View style={{ flex: 1, paddingRight: 10 }}>
+            <View style={{ flex: 1, marginRight: 10 }}>
               <View style={styles.categoryBadgeRow}>
-                <Text style={styles.categoryText}>{item.category.toUpperCase()}</Text>
+                <Text style={styles.categoryText}>{item.category}</Text>
                 <Text style={styles.dotSeparator}>•</Text>
-                <Text style={styles.areaText}>{item.area || 'Metro Area'}</Text>
+                <Text style={styles.areaText}>{item.area || 'Downtown'}</Text>
               </View>
-
-              <Text style={styles.shopName}>{item.name}</Text>
-              
+              <Text style={styles.shopName} numberOfLines={1}>
+                {item.name}
+              </Text>
               {item.owner && (
                 <View style={styles.ownerRow}>
-                  <Text style={styles.ownerIcon}>✉️</Text>
-                  <Text style={styles.ownerText}>{item.owner.email}</Text>
+                  <Text style={styles.ownerIcon}>👤</Text>
+                  <Text style={styles.ownerText} numberOfLines={1}>
+                    {item.owner.email}
+                  </Text>
                 </View>
               )}
             </View>
 
-            <View style={[styles.statusBadge, { backgroundColor: statusBg, borderColor: statusColor }]}>
-              <View style={[styles.statusDot, { backgroundColor: statusColor }]} />
-              <Text style={[styles.statusText, { color: statusColor }]}>
+            {/* Status Pill */}
+            <View
+              style={[
+                styles.statusBadge,
+                { backgroundColor: statusBg, borderColor: statusBorder },
+              ]}
+            >
+              <View style={[styles.statusDot, { backgroundColor: statusDotCol }]} />
+              <Text style={[styles.statusText, { color: statusTextCol }]}>
                 {item.status.toUpperCase()}
               </Text>
             </View>
           </View>
 
-          {/* Occupancy Mini Progress Bar */}
+          {/* Occupancy Progress Bar */}
           <View style={styles.occupancyBarContainer}>
             <View style={styles.occupancyLabelRow}>
-              <Text style={styles.occupancyLabel}>Live Occupancy</Text>
-              <Text style={styles.occupancyVal}>{occupancy}% ({item.bookedCount}/{item.totalSlots})</Text>
+              <Text style={styles.occupancyLabel}>Today's Occupancy</Text>
+              <Text style={styles.occupancyVal}>{occupancy}%</Text>
             </View>
             <View style={styles.progressBarTrack}>
               <View
                 style={[
                   styles.progressBarFill,
                   {
-                    width: `${Math.min(occupancy, 100)}%`,
-                    backgroundColor: isAvailable ? colors.primaryGlow : colors.busyGlow,
+                    width: `${occupancy}%`,
+                    backgroundColor:
+                      occupancy > 75
+                        ? colors.busyGlow
+                        : occupancy > 0
+                        ? colors.primaryGlow
+                        : colors.closedGlow,
                   },
                 ]}
               />
@@ -280,13 +304,14 @@ export const AdminDashboardScreen: React.FC = () => {
 
           <View style={styles.cardDivider} />
 
+          {/* Bottom Row: Cadence & Actions */}
           <View style={styles.cardBottom}>
             <View style={styles.scheduleInfo}>
               <Text style={styles.schedText}>
-                🕒 {item.workingHoursStart}–{item.workingHoursEnd} ({item.slotDurationMinutes}m)
+                🕒 {item.workingHoursStart}–{item.workingHoursEnd} ({item.slotDurationMinutes}m slots)
               </Text>
               <Text style={styles.slotCounts}>
-                <Text style={{ color: colors.availableGlow, fontWeight: '700' }}>{item.availableCount} open</Text> • {item.bookedCount} booked
+                🟢 {item.availableCount ?? 0} open • 🟡 {item.bookedCount ?? 0} booked • ⚪ {item.closedCount ?? 0} closed
               </Text>
             </View>
 
@@ -295,7 +320,7 @@ export const AdminDashboardScreen: React.FC = () => {
               onPress={() => setSelectedShopForEdit(item)}
               activeOpacity={0.8}
             >
-              <Text style={styles.editBtnText}>⚙️ Edit Shop</Text>
+              <Text style={styles.editBtnText}>✏️ Edit Shop</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -320,8 +345,8 @@ export const AdminDashboardScreen: React.FC = () => {
       <FlatList
         data={filteredShops}
         keyExtractor={(item) => item.id}
-        ListHeaderComponent={renderHeader}
         renderItem={renderShopItem}
+        ListHeaderComponent={renderHeader}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
         refreshControl={
@@ -336,14 +361,12 @@ export const AdminDashboardScreen: React.FC = () => {
         }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No shops matched your search.</Text>
+            <Text style={styles.emptyText}>No studios found matching your filter.</Text>
           </View>
         }
         ListFooterComponent={
           <View style={styles.footerLogoutCard}>
-            <Text style={styles.footerUserText}>
-              Platform Admin Session ({user?.email})
-            </Text>
+            <Text style={styles.footerUserText}>Logged in as {user?.email} (Admin)</Text>
             <TouchableOpacity
               style={styles.footerLogoutBtn}
               onPress={logout}
@@ -383,9 +406,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#070A12',
   },
   loadingText: {
-    marginTop: 14,
+    marginTop: 16,
     color: colors.textSecondary,
-    fontSize: 14,
+    fontSize: 15,
+    fontWeight: '600',
   },
   listContent: {
     paddingBottom: 40,
@@ -404,17 +428,17 @@ const styles = StyleSheet.create({
   platformBadgeRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 7,
     marginBottom: 4,
   },
   platformDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
     backgroundColor: '#FBBF24',
   },
   platformBadge: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: '800',
     color: '#FBBF24',
     letterSpacing: 1,
@@ -425,20 +449,20 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
   },
   subTitle: {
-    fontSize: 12,
+    fontSize: 13,
     color: colors.textSecondary,
-    marginTop: 2,
+    marginTop: 3,
   },
   logoutBtn: {
-    backgroundColor: 'rgba(239, 68, 68, 0.15)',
-    paddingHorizontal: 12,
-    paddingVertical: 7,
+    backgroundColor: 'rgba(239, 68, 68, 0.16)',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(239, 68, 68, 0.4)',
+    borderWidth: 1.2,
+    borderColor: 'rgba(239, 68, 68, 0.45)',
   },
   logoutText: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '800',
     color: '#FCA5A5',
   },
@@ -446,7 +470,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   statsTitle: {
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '800',
     color: colors.textMuted,
     letterSpacing: 0.8,
@@ -454,104 +478,110 @@ const styles = StyleSheet.create({
   },
   statsRow: {
     flexDirection: 'row',
-    gap: 10,
-    marginBottom: 10,
+    gap: 12,
+    marginBottom: 12,
   },
   statQuadCard: {
     flex: 1,
-    borderRadius: 18,
-    padding: 14,
-    borderWidth: 1,
+    borderRadius: 20,
+    padding: 16,
+    borderWidth: 1.2,
+    minHeight: 104,
+    justifyContent: 'space-between',
   },
   purpleQuad: {
-    backgroundColor: 'rgba(168, 85, 247, 0.08)',
-    borderColor: 'rgba(168, 85, 247, 0.22)',
+    backgroundColor: 'rgba(168, 85, 247, 0.12)',
+    borderColor: 'rgba(168, 85, 247, 0.3)',
   },
   greenQuad: {
-    backgroundColor: 'rgba(16, 185, 129, 0.08)',
-    borderColor: 'rgba(16, 185, 129, 0.22)',
+    backgroundColor: 'rgba(16, 185, 129, 0.12)',
+    borderColor: 'rgba(16, 185, 129, 0.3)',
   },
   peachQuad: {
-    backgroundColor: 'rgba(249, 115, 22, 0.08)',
-    borderColor: 'rgba(249, 115, 22, 0.22)',
+    backgroundColor: 'rgba(249, 115, 22, 0.12)',
+    borderColor: 'rgba(249, 115, 22, 0.3)',
   },
   cyanQuad: {
-    backgroundColor: 'rgba(6, 182, 212, 0.08)',
-    borderColor: 'rgba(6, 182, 212, 0.22)',
+    backgroundColor: 'rgba(6, 182, 212, 0.12)',
+    borderColor: 'rgba(6, 182, 212, 0.3)',
   },
   statQuadHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: 6,
   },
   statVal: {
-    fontSize: 22,
+    fontSize: 26,
     fontWeight: '900',
     color: colors.textPrimary,
   },
   statLbl: {
-    fontSize: 11,
+    fontSize: 13,
     color: colors.textSecondary,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   controlsRow: {
     flexDirection: 'row',
     gap: 10,
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 14,
   },
   searchInput: {
     flex: 1,
-    height: 48,
-    backgroundColor: 'rgba(18, 24, 38, 0.8)',
+    height: 50,
+    backgroundColor: 'rgba(18, 24, 38, 0.85)',
     borderRadius: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.09)',
-    paddingHorizontal: 14,
+    borderWidth: 1.2,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    paddingHorizontal: 16,
     color: colors.textPrimary,
-    fontSize: 13,
+    fontSize: 14,
+    fontWeight: '500',
   },
   addBtn: {
     backgroundColor: colors.primary,
-    height: 48,
-    paddingHorizontal: 16,
+    height: 50,
+    paddingHorizontal: 18,
     borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.35,
+    shadowOpacity: 0.4,
     shadowRadius: 8,
     elevation: 4,
   },
   addBtnText: {
     color: '#FFF',
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '800',
   },
   categoryScroll: {
     flexDirection: 'row',
-    gap: 8,
+    gap: 10,
     paddingVertical: 4,
     marginBottom: 16,
   },
   categoryChip: {
-    paddingHorizontal: 14,
-    paddingVertical: 7,
-    borderRadius: 12,
-    borderWidth: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 14,
+    borderWidth: 1.2,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   categoryChipInactive: {
-    backgroundColor: 'rgba(255, 255, 255, 0.04)',
-    borderColor: 'rgba(255, 255, 255, 0.07)',
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   categoryChipActive: {
     backgroundColor: 'rgba(99, 102, 241, 0.25)',
     borderColor: colors.primaryGlow,
   },
   categoryChipText: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '600',
     color: colors.textSecondary,
   },
@@ -567,37 +597,37 @@ const styles = StyleSheet.create({
     paddingHorizontal: 2,
   },
   listSubTitle: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '800',
     color: colors.textMuted,
     letterSpacing: 0.8,
   },
   listSubHint: {
-    fontSize: 11,
+    fontSize: 12,
     color: colors.availableGlow,
     fontWeight: '600',
   },
   shopCard: {
     marginHorizontal: 20,
     marginVertical: 8,
-    backgroundColor: 'rgba(18, 24, 38, 0.72)',
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.07)',
+    backgroundColor: 'rgba(18, 24, 38, 0.8)',
+    borderRadius: 20,
+    borderWidth: 1.2,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     flexDirection: 'row',
     overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 4,
   },
   shopCardAccentRail: {
-    width: 5,
+    width: 6,
   },
   shopCardInner: {
     flex: 1,
-    padding: 16,
+    padding: 18,
   },
   cardTop: {
     flexDirection: 'row',
@@ -607,93 +637,94 @@ const styles = StyleSheet.create({
   categoryBadgeRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    marginBottom: 4,
+    gap: 7,
+    marginBottom: 5,
   },
   categoryText: {
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '800',
     color: colors.primaryGlow,
     letterSpacing: 0.6,
   },
   dotSeparator: {
-    fontSize: 10,
+    fontSize: 12,
     color: colors.textMuted,
   },
   areaText: {
-    fontSize: 11,
+    fontSize: 13,
     color: colors.textSecondary,
+    fontWeight: '600',
   },
   shopName: {
-    fontSize: 17,
+    fontSize: 19,
     fontWeight: '900',
     color: colors.textPrimary,
   },
   ownerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
-    marginTop: 4,
+    gap: 6,
+    marginTop: 5,
   },
   ownerIcon: {
-    fontSize: 10,
+    fontSize: 12,
   },
   ownerText: {
-    fontSize: 11,
+    fontSize: 13,
     color: colors.textMuted,
   },
   statusBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-    borderWidth: 1,
-    gap: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 10,
+    borderWidth: 1.2,
+    gap: 6,
   },
   statusDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
   },
   statusText: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: '800',
     letterSpacing: 0.5,
   },
   occupancyBarContainer: {
-    marginTop: 12,
+    marginTop: 14,
   },
   occupancyLabelRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: 6,
   },
   occupancyLabel: {
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '700',
     color: colors.textMuted,
   },
   occupancyVal: {
-    fontSize: 11,
+    fontSize: 13,
     fontWeight: '700',
     color: colors.textSecondary,
   },
   progressBarTrack: {
-    height: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.06)',
-    borderRadius: 2,
+    height: 6,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderRadius: 3,
     overflow: 'hidden',
   },
   progressBarFill: {
     height: '100%',
-    borderRadius: 2,
+    borderRadius: 3,
   },
   cardDivider: {
     height: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    marginVertical: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    marginVertical: 14,
   },
   cardBottom: {
     flexDirection: 'row',
@@ -702,27 +733,29 @@ const styles = StyleSheet.create({
   },
   scheduleInfo: {
     flex: 1,
+    marginRight: 10,
   },
   schedText: {
-    fontSize: 11,
+    fontSize: 13,
     color: colors.textPrimary,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   slotCounts: {
-    fontSize: 11,
+    fontSize: 12,
     color: colors.textSecondary,
-    marginTop: 2,
+    marginTop: 3,
+    fontWeight: '500',
   },
   editBtn: {
-    backgroundColor: 'rgba(255, 255, 255, 0.06)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.12)',
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderWidth: 1.2,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 12,
   },
   editBtnText: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '800',
     color: colors.textPrimary,
   },
@@ -732,35 +765,36 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     color: colors.textMuted,
-    fontSize: 14,
+    fontSize: 15,
   },
   footerLogoutCard: {
-    marginTop: 20,
+    marginTop: 24,
     marginBottom: 40,
     marginHorizontal: 20,
-    padding: 18,
-    borderRadius: 18,
-    backgroundColor: 'rgba(18, 24, 38, 0.6)',
-    borderWidth: 1,
+    padding: 20,
+    borderRadius: 20,
+    backgroundColor: 'rgba(18, 24, 38, 0.7)',
+    borderWidth: 1.2,
     borderColor: 'rgba(255, 255, 255, 0.08)',
     alignItems: 'center',
   },
   footerUserText: {
-    fontSize: 12,
+    fontSize: 13,
     color: colors.textSecondary,
-    marginBottom: 10,
+    marginBottom: 12,
+    fontWeight: '600',
   },
   footerLogoutBtn: {
-    backgroundColor: 'rgba(239, 68, 68, 0.15)',
-    borderWidth: 1,
-    borderColor: 'rgba(239, 68, 68, 0.4)',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 12,
+    backgroundColor: 'rgba(239, 68, 68, 0.16)',
+    borderWidth: 1.2,
+    borderColor: 'rgba(239, 68, 68, 0.45)',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 14,
   },
   footerLogoutBtnText: {
     color: '#F87171',
     fontWeight: '800',
-    fontSize: 13,
+    fontSize: 14,
   },
 });

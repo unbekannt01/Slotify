@@ -250,32 +250,16 @@ export const OwnerDashboardScreen: React.FC = () => {
     <View style={styles.container}>
       <BackgroundMesh />
 
-      {/* Top Organic Header with Curves (Image 2 style) */}
-      <View style={[styles.heroHeader, { paddingTop: Math.max(insets.top + 10, 48) }]}>
-        <View style={styles.heroTopRow}>
-          <View style={{ flex: 1, marginRight: 10 }}>
-            <View style={styles.brandBadge}>
-              <View style={styles.brandDot} />
-              <Text style={styles.ownerRoleTag}>SLOTIFY STUDIO OWNER</Text>
-            </View>
-            <Text style={styles.shopHeading} numberOfLines={1}>
-              {shop.name}
-            </Text>
-            <Text style={styles.shopSub} numberOfLines={1}>
-              {shop.category} • {shop.area || 'Studio'}
-            </Text>
+      {/* Top Redesigned Header: Clean 2-Tier Layout with spacious action pills */}
+      <View style={[styles.heroHeader, { paddingTop: Math.max(insets.top + 8, 46) }]}>
+        {/* Tier 1: Platform Brand Pill + Quick Action Toolbar */}
+        <View style={styles.heroTopNav}>
+          <View style={styles.brandBadge}>
+            <View style={styles.brandDot} />
+            <Text style={styles.ownerRoleTag}>STUDIO CONTROL</Text>
           </View>
 
           <View style={styles.headerRightActions}>
-            <TouchableOpacity
-              style={styles.kioskBtn}
-              onPress={() => setKioskModalVisible(true)}
-              activeOpacity={0.8}
-            >
-              <View style={styles.kioskLiveDot} />
-              <Text style={styles.kioskBtnText}>Kiosk (Hands-Free)</Text>
-            </TouchableOpacity>
-
             <TouchableOpacity
               style={styles.voiceBtn}
               onPress={() => setVoiceModalVisible(true)}
@@ -300,11 +284,43 @@ export const OwnerDashboardScreen: React.FC = () => {
           </View>
         </View>
 
-        {/* View Mode Segmented Switcher (Image 2 pills) */}
+        {/* Tier 2: Studio Identity with large title and metadata */}
+        <View style={styles.studioInfoBox}>
+          <Text style={styles.shopHeading} numberOfLines={1}>
+            {shop.name}
+          </Text>
+          <View style={styles.shopMetaRow}>
+            <View style={styles.categoryPill}>
+              <Text style={styles.categoryPillText}>{shop.category}</Text>
+            </View>
+            <Text style={styles.shopAreaText}>• {shop.area || 'Studio Center'}</Text>
+          </View>
+        </View>
+
+        {/* Dedicated Ambient Counter Kiosk Mode Button Card */}
+        <TouchableOpacity
+          style={styles.kioskBarCard}
+          onPress={() => setKioskModalVisible(true)}
+          activeOpacity={0.85}
+        >
+          <View style={styles.kioskBarLeft}>
+            <View style={styles.kioskLiveDot} />
+            <View>
+              <Text style={styles.kioskBarTitle}>Hands-Free Counter Kiosk Mode</Text>
+              <Text style={styles.kioskBarSub}>Customer-facing screen with voice booking</Text>
+            </View>
+          </View>
+          <View style={styles.kioskLaunchBadge}>
+            <Text style={styles.kioskLaunchText}>Launch →</Text>
+          </View>
+        </TouchableOpacity>
+
+        {/* View Mode Segmented Switcher */}
         <View style={styles.viewSegmentRow}>
           <TouchableOpacity
             style={[styles.segmentBtn, viewMode === 'smart' && styles.segmentBtnActive]}
             onPress={() => setViewMode('smart')}
+            activeOpacity={0.8}
           >
             <Text
               style={[
@@ -319,6 +335,7 @@ export const OwnerDashboardScreen: React.FC = () => {
           <TouchableOpacity
             style={[styles.segmentBtn, viewMode === 'extruded' && styles.segmentBtnActive]}
             onPress={() => setViewMode('extruded')}
+            activeOpacity={0.8}
           >
             <Text
               style={[
@@ -341,7 +358,7 @@ export const OwnerDashboardScreen: React.FC = () => {
 
       {/* Main Scrollable View */}
       <ScrollView
-        contentContainerStyle={[styles.scrollContent, { paddingBottom: 110 }]}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: 120 }]}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
@@ -362,7 +379,7 @@ export const OwnerDashboardScreen: React.FC = () => {
           nextSlot={nextAvailableSlot?.start}
         />
 
-        {/* 4-Card Pastel Metrics Grid (Image 1 feature) */}
+        {/* 4-Card Pastel Metrics Grid */}
         <MetricsQuadGrid
           availableCount={counts.available}
           bookedCount={counts.booked}
@@ -370,13 +387,13 @@ export const OwnerDashboardScreen: React.FC = () => {
           slotDuration={shop.slotDurationMinutes}
         />
 
-        {/* Floating Calendar Date Strip (Image 3 & 5 feature) */}
+        {/* Floating Calendar Date Strip */}
         <FloatingDateStrip
           availableCount={counts.available}
           onSelectDate={(date) => showTemporaryNotice(`Viewing availability for ${date}`)}
         />
 
-        {/* Service Category Rail (Image 4 feature) */}
+        {/* Service Category Rail */}
         <ServicePillRail />
 
         {/* Quick Availability Controls Bar */}
@@ -423,7 +440,7 @@ export const OwnerDashboardScreen: React.FC = () => {
         </View>
       </ScrollView>
 
-      {/* Floating Bottom Action Dock (Image 1, 2, 7 feature) */}
+      {/* Floating Bottom Action Dock */}
       <FloatingActionDock
         onQuickBreak={handleCloseForBreak}
         onOpenAll={handleOpenAll}
@@ -434,7 +451,7 @@ export const OwnerDashboardScreen: React.FC = () => {
         onShowQuickMenu={() => showTemporaryNotice(`Shop status: ${status.toUpperCase()} (${counts.available} open)`)}
       />
 
-      {/* Slot Inspector Modal (Image 5 & 7 feature) */}
+      {/* Slot Inspector Modal */}
       <SlotInspectorModal
         visible={!!inspectSlot}
         slot={inspectSlot}
@@ -495,150 +512,192 @@ const styles = StyleSheet.create({
     backgroundColor: colors.bgCanvas,
   },
   loadingText: {
-    marginTop: 14,
+    marginTop: 16,
     color: colors.textSecondary,
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '600',
   },
   heroHeader: {
-    backgroundColor: '#12162A',
+    backgroundColor: '#111528',
     borderBottomLeftRadius: 28,
     borderBottomRightRadius: 28,
     borderBottomWidth: 1.5,
-    borderBottomColor: 'rgba(99, 102, 241, 0.25)',
+    borderBottomColor: 'rgba(99, 102, 241, 0.28)',
     paddingHorizontal: 20,
-    paddingBottom: 16,
+    paddingBottom: 18,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.45,
-    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.5,
+    shadowRadius: 18,
     elevation: 8,
   },
-  heroTopRow: {
+  heroTopNav: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     marginBottom: 14,
   },
   brandBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    marginBottom: 3,
+    backgroundColor: 'rgba(0, 245, 155, 0.12)',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 245, 155, 0.3)',
+    gap: 7,
   },
   brandDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
     backgroundColor: '#00F59B',
   },
   ownerRoleTag: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: '800',
     color: '#00F59B',
     letterSpacing: 1,
-  },
-  shopHeading: {
-    fontSize: 21,
-    fontWeight: '900',
-    color: colors.textPrimary,
-  },
-  shopSub: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    marginTop: 2,
   },
   headerRightActions: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
   },
-  kioskBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(16, 185, 129, 0.16)',
-    paddingHorizontal: 10,
-    paddingVertical: 7,
-    borderRadius: 12,
-    borderWidth: 1.2,
-    borderColor: '#10B981',
-    gap: 5,
-    shadowColor: '#10B981',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.35,
-    shadowRadius: 6,
-    elevation: 3,
-  },
-  kioskLiveDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#34D399',
-  },
-  kioskBtnText: {
-    fontSize: 11,
-    fontWeight: '800',
-    color: '#34D399',
-    letterSpacing: 0.2,
-  },
   voiceBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#6366F1',
-    paddingHorizontal: 11,
-    paddingVertical: 7,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     borderRadius: 12,
     borderWidth: 1.2,
     borderColor: 'rgba(255, 255, 255, 0.25)',
     shadowColor: '#6366F1',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.45,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+    elevation: 3,
   },
   voiceBtnText: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '800',
     color: '#FFFFFF',
-    letterSpacing: 0.2,
   },
   hoursBtn: {
     backgroundColor: 'rgba(255, 255, 255, 0.08)',
     paddingHorizontal: 10,
-    paddingVertical: 7,
+    paddingVertical: 8,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.12)',
   },
   hoursBtnText: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '700',
     color: colors.textPrimary,
   },
   logoutBtn: {
-    backgroundColor: 'rgba(239, 68, 68, 0.18)',
-    width: 36,
-    height: 36,
+    backgroundColor: 'rgba(239, 68, 68, 0.16)',
+    width: 38,
+    height: 38,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(239, 68, 68, 0.5)',
+    borderColor: 'rgba(239, 68, 68, 0.45)',
   },
   logoutText: {
-    fontSize: 14,
+    fontSize: 15,
+  },
+  studioInfoBox: {
+    marginBottom: 14,
+  },
+  shopHeading: {
+    fontSize: 24,
+    fontWeight: '900',
+    color: colors.textPrimary,
+    letterSpacing: -0.3,
+  },
+  shopMetaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 5,
+  },
+  categoryPill: {
+    backgroundColor: 'rgba(99, 102, 241, 0.18)',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 8,
+  },
+  categoryPillText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: colors.primaryGlow,
+  },
+  shopAreaText: {
+    fontSize: 13,
+    color: colors.textSecondary,
+    fontWeight: '600',
+  },
+  kioskBarCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: 'rgba(16, 185, 129, 0.12)',
+    borderWidth: 1.2,
+    borderColor: 'rgba(16, 185, 129, 0.4)',
+    borderRadius: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    marginBottom: 14,
+  },
+  kioskBarLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    flex: 1,
+  },
+  kioskLiveDot: {
+    width: 9,
+    height: 9,
+    borderRadius: 4.5,
+    backgroundColor: '#34D399',
+  },
+  kioskBarTitle: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#34D399',
+  },
+  kioskBarSub: {
+    fontSize: 11,
+    color: colors.textSecondary,
+    marginTop: 1,
+  },
+  kioskLaunchBadge: {
+    backgroundColor: '#10B981',
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 10,
+  },
+  kioskLaunchText: {
+    fontSize: 12,
+    fontWeight: '900',
+    color: '#064E3B',
   },
   viewSegmentRow: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(0, 0, 0, 0.35)',
-    borderRadius: 14,
-    padding: 3,
-    gap: 4,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    borderRadius: 16,
+    padding: 4,
+    gap: 6,
   },
   segmentBtn: {
     flex: 1,
-    paddingVertical: 8,
-    borderRadius: 11,
+    height: 42,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -646,12 +705,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.4,
+    shadowOpacity: 0.45,
     shadowRadius: 6,
     elevation: 3,
   },
   segmentBtnText: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '700',
     color: colors.textMuted,
   },
@@ -663,44 +722,46 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(99, 102, 241, 0.25)',
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(99, 102, 241, 0.4)',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
   },
   noticeText: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '700',
     color: '#E0E7FF',
     textAlign: 'center',
   },
   scrollContent: {
-    padding: 16,
+    paddingHorizontal: 18,
+    paddingTop: 14,
   },
   footerLogoutCard: {
-    marginTop: 20,
+    marginTop: 24,
     marginBottom: 20,
-    padding: 16,
-    borderRadius: 18,
-    backgroundColor: 'rgba(18, 24, 38, 0.6)',
-    borderWidth: 1,
+    padding: 18,
+    borderRadius: 20,
+    backgroundColor: 'rgba(18, 24, 38, 0.7)',
+    borderWidth: 1.2,
     borderColor: 'rgba(255, 255, 255, 0.08)',
     alignItems: 'center',
   },
   footerUserText: {
-    fontSize: 12,
+    fontSize: 13,
     color: colors.textSecondary,
-    marginBottom: 10,
+    marginBottom: 12,
+    fontWeight: '600',
   },
   footerLogoutBtn: {
-    backgroundColor: 'rgba(239, 68, 68, 0.15)',
-    borderWidth: 1,
-    borderColor: 'rgba(239, 68, 68, 0.4)',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 12,
+    backgroundColor: 'rgba(239, 68, 68, 0.16)',
+    borderWidth: 1.2,
+    borderColor: 'rgba(239, 68, 68, 0.45)',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 14,
   },
   footerLogoutBtnText: {
     color: '#F87171',
     fontWeight: '800',
-    fontSize: 13,
+    fontSize: 14,
   },
 });

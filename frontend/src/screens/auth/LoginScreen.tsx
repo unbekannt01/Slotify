@@ -109,7 +109,13 @@ export const LoginScreen: React.FC = () => {
 
           {/* Login Card */}
           <View style={styles.loginCard}>
-            <Text style={styles.cardTitle}>SIGN IN</Text>
+            <View style={styles.cardHeaderRow}>
+              <Text style={styles.cardTitle}>SIGN IN TO PORTAL</Text>
+              <View style={styles.liveIndicator}>
+                <View style={styles.liveDot} />
+                <Text style={styles.liveText}>SECURE</Text>
+              </View>
+            </View>
 
             {errorMsg && (
               <View style={styles.errorBox}>
@@ -148,7 +154,7 @@ export const LoginScreen: React.FC = () => {
               style={styles.submitBtn}
             >
               {isLoading ? (
-                <ActivityIndicator color="#FFF" />
+                <ActivityIndicator color="#FFF" size="small" />
               ) : (
                 <Text style={styles.submitText}>Enter Portal →</Text>
               )}
@@ -157,29 +163,38 @@ export const LoginScreen: React.FC = () => {
 
           {/* Quick Demo Credentials Switcher */}
           <View style={styles.demoSection}>
-            <Text style={styles.demoTitle}>QUICK PRESETS (TAP TO FILL)</Text>
+            <Text style={styles.demoTitle}>QUICK DEMO PRESETS</Text>
             <View style={styles.demoRow}>
               <TouchableOpacity
                 style={styles.demoChip}
                 onPress={() => fillPreset('owner@luxe.com', 'owner123')}
+                activeOpacity={0.8}
               >
-                <Text style={styles.demoChipRole}>Owner</Text>
+                <View style={styles.demoChipBadge}>
+                  <Text style={styles.demoChipRole}>OWNER</Text>
+                </View>
                 <Text style={styles.demoChipShop}>Luxe Salon</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={styles.demoChip}
                 onPress={() => fillPreset('barber@apex.com', 'barber123')}
+                activeOpacity={0.8}
               >
-                <Text style={styles.demoChipRole}>Owner</Text>
+                <View style={styles.demoChipBadge}>
+                  <Text style={styles.demoChipRole}>OWNER</Text>
+                </View>
                 <Text style={styles.demoChipShop}>Apex Barber</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={[styles.demoChip, styles.adminChip]}
                 onPress={() => fillPreset('admin@slotify.com', 'admin123')}
+                activeOpacity={0.8}
               >
-                <Text style={[styles.demoChipRole, { color: '#FBBF24' }]}>Admin</Text>
+                <View style={[styles.demoChipBadge, styles.adminChipBadge]}>
+                  <Text style={[styles.demoChipRole, { color: '#FBBF24' }]}>ADMIN</Text>
+                </View>
                 <Text style={styles.demoChipShop}>Platform Dev</Text>
               </TouchableOpacity>
             </View>
@@ -202,15 +217,17 @@ export const LoginScreen: React.FC = () => {
                 ]}
               />
               <Text style={styles.connUrlText} numberOfLines={1}>
-                Server: {serverUrl}
+                {serverOnline === true ? 'Online: ' : serverOnline === false ? 'Offline: ' : 'Checking: '}
+                {serverUrl}
               </Text>
 
               <TouchableOpacity
                 onPress={() => setEditingServer(!editingServer)}
                 style={styles.changeBtn}
+                activeOpacity={0.8}
               >
                 <Text style={styles.changeBtnText}>
-                  {editingServer ? 'Done' : 'Change'}
+                  {editingServer ? 'Done' : 'Edit URL'}
                 </Text>
               </TouchableOpacity>
 
@@ -218,6 +235,7 @@ export const LoginScreen: React.FC = () => {
                 onPress={() => checkServerConnection(serverUrl)}
                 disabled={pinging}
                 style={styles.testBtn}
+                activeOpacity={0.8}
               >
                 <Text style={styles.testBtnText}>
                   {pinging ? '...' : 'Ping'}
@@ -239,14 +257,14 @@ export const LoginScreen: React.FC = () => {
                   style={styles.saveServerBtn}
                   onPress={handleSaveServerUrl}
                 >
-                  <Text style={styles.saveServerBtnText}>Set</Text>
+                  <Text style={styles.saveServerBtnText}>Save</Text>
                 </TouchableOpacity>
               </View>
             )}
 
             {serverOnline === false && (
               <Text style={styles.offlineHint}>
-                ⚠️ Cannot connect to backend server. If using a physical phone, ensure phone and PC are on the same Wi-Fi and set the server URL to your PC's IP (e.g. http://10.240.100.45:5000).
+                ⚠️ Cannot connect to backend server. If using a physical phone, ensure phone and PC are on the same Wi-Fi and set the server URL to your PC's IP address.
               </Text>
             )}
           </View>
@@ -265,10 +283,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 36,
+    paddingHorizontal: 20,
+    paddingTop: 54,
+    paddingBottom: 40,
   },
   brandContainer: {
     alignItems: 'center',
@@ -277,60 +294,89 @@ const styles = StyleSheet.create({
   logoPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(99, 102, 241, 0.18)',
-    borderWidth: 1,
-    borderColor: 'rgba(99, 102, 241, 0.4)',
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 20,
-    marginBottom: 14,
+    backgroundColor: 'rgba(99, 102, 241, 0.16)',
+    paddingHorizontal: 16,
+    paddingVertical: 7,
+    borderRadius: 24,
+    borderWidth: 1.2,
+    borderColor: 'rgba(99, 102, 241, 0.35)',
+    marginBottom: 16,
   },
   logoDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: colors.primaryGlow,
+    backgroundColor: '#00F59B',
     marginRight: 8,
   },
   logoText: {
     fontSize: 13,
     fontWeight: '900',
-    color: '#FFF',
-    letterSpacing: 1.5,
+    color: '#E0E7FF',
+    letterSpacing: 1.6,
   },
   headline: {
-    fontSize: 24,
-    fontWeight: '800',
+    fontSize: 26,
+    fontWeight: '900',
     color: colors.textPrimary,
     textAlign: 'center',
     letterSpacing: -0.4,
+    lineHeight: 32,
   },
   tagline: {
-    fontSize: 12,
+    fontSize: 14,
     color: colors.textSecondary,
     textAlign: 'center',
-    marginTop: 6,
+    marginTop: 8,
     maxWidth: 320,
-    lineHeight: 18,
+    lineHeight: 20,
   },
   loginCard: {
-    backgroundColor: 'rgba(18, 24, 38, 0.85)',
-    borderRadius: 24,
-    borderWidth: 1,
+    backgroundColor: 'rgba(18, 24, 38, 0.92)',
+    borderRadius: 22,
+    borderWidth: 1.2,
     borderColor: colors.borderGlass,
-    padding: 24,
+    padding: 22,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.45,
+    shadowOpacity: 0.5,
     shadowRadius: 24,
     elevation: 8,
+  },
+  cardHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 18,
   },
   cardTitle: {
     fontSize: 13,
     fontWeight: '800',
     color: colors.textSecondary,
     letterSpacing: 1,
-    marginBottom: 16,
+  },
+  liveIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(16, 185, 129, 0.14)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(16, 185, 129, 0.3)',
+    gap: 5,
+  },
+  liveDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: colors.availableGlow,
+  },
+  liveText: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: colors.availableGlow,
+    letterSpacing: 0.5,
   },
   errorBox: {
     backgroundColor: colors.dangerBg,
@@ -342,32 +388,33 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: '#FCA5A5',
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '600',
-    lineHeight: 16,
+    lineHeight: 18,
   },
   inputGroup: {
     marginBottom: 16,
   },
   inputLabel: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '700',
-    color: colors.textMuted,
+    color: colors.textSecondary,
     letterSpacing: 0.6,
-    marginBottom: 6,
+    marginBottom: 8,
   },
   input: {
-    height: 50,
+    height: 52,
     backgroundColor: colors.bgInput,
     borderRadius: 14,
-    borderWidth: 1,
+    borderWidth: 1.2,
     borderColor: colors.borderSubtle,
     paddingHorizontal: 16,
     color: colors.textPrimary,
     fontSize: 15,
+    fontWeight: '500',
   },
   submitBtn: {
-    height: 52,
+    height: 54,
     backgroundColor: colors.primary,
     borderRadius: 14,
     alignItems: 'center',
@@ -375,100 +422,111 @@ const styles = StyleSheet.create({
     marginTop: 8,
     shadowColor: colors.primaryGlow,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 10,
+    shadowOpacity: 0.45,
+    shadowRadius: 12,
+    elevation: 4,
   },
   submitText: {
     color: '#FFF',
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '800',
     letterSpacing: 0.4,
   },
   demoSection: {
-    marginTop: 22,
-    alignItems: 'center',
+    marginTop: 24,
   },
   demoTitle: {
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '800',
     color: colors.textMuted,
-    letterSpacing: 1,
+    letterSpacing: 0.8,
     marginBottom: 10,
+    textAlign: 'center',
   },
   demoRow: {
     flexDirection: 'row',
-    gap: 8,
+    gap: 10,
   },
   demoChip: {
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    borderWidth: 1,
+    flex: 1,
+    backgroundColor: 'rgba(18, 24, 38, 0.8)',
+    borderWidth: 1.2,
     borderColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 12,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+    borderRadius: 14,
+    paddingVertical: 10,
+    paddingHorizontal: 8,
     alignItems: 'center',
   },
   adminChip: {
-    borderColor: 'rgba(245, 158, 11, 0.35)',
+    borderColor: 'rgba(245, 158, 11, 0.4)',
     backgroundColor: 'rgba(245, 158, 11, 0.08)',
   },
+  demoChipBadge: {
+    backgroundColor: 'rgba(99, 102, 241, 0.2)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+    marginBottom: 4,
+  },
+  adminChipBadge: {
+    backgroundColor: 'rgba(245, 158, 11, 0.2)',
+  },
   demoChipRole: {
-    fontSize: 9,
+    fontSize: 10,
     fontWeight: '800',
     color: colors.primaryGlow,
-    letterSpacing: 0.5,
+    letterSpacing: 0.6,
   },
   demoChipShop: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '700',
     color: colors.textPrimary,
-    marginTop: 2,
   },
   connectionBar: {
     marginTop: 24,
-    backgroundColor: 'rgba(18, 24, 38, 0.6)',
-    borderRadius: 14,
-    borderWidth: 1,
+    backgroundColor: 'rgba(18, 24, 38, 0.75)',
+    borderRadius: 16,
+    borderWidth: 1.2,
     borderColor: 'rgba(255, 255, 255, 0.08)',
-    padding: 12,
+    padding: 14,
   },
   connStatusRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   statusDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
     marginRight: 8,
   },
   connUrlText: {
     flex: 1,
-    fontSize: 11,
+    fontSize: 12,
     color: colors.textSecondary,
     fontWeight: '600',
   },
   changeBtn: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
     backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    borderRadius: 6,
+    borderRadius: 8,
     marginLeft: 6,
   },
   changeBtnText: {
-    fontSize: 11,
+    fontSize: 12,
     color: colors.primaryGlow,
     fontWeight: '700',
   },
   testBtn: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    backgroundColor: 'rgba(99, 102, 241, 0.2)',
-    borderRadius: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: 'rgba(99, 102, 241, 0.25)',
+    borderRadius: 8,
     marginLeft: 6,
   },
   testBtnText: {
-    fontSize: 11,
+    fontSize: 12,
     color: '#FFF',
     fontWeight: '700',
   },
@@ -479,31 +537,31 @@ const styles = StyleSheet.create({
   },
   serverInput: {
     flex: 1,
-    height: 38,
+    height: 42,
     backgroundColor: colors.bgInput,
-    borderRadius: 8,
+    borderRadius: 10,
     borderWidth: 1,
     borderColor: colors.borderSubtle,
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
     color: colors.textPrimary,
-    fontSize: 12,
+    fontSize: 13,
   },
   saveServerBtn: {
     backgroundColor: colors.primary,
-    paddingHorizontal: 14,
-    borderRadius: 8,
+    paddingHorizontal: 16,
+    borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
   },
   saveServerBtnText: {
     color: '#FFF',
     fontWeight: '700',
-    fontSize: 12,
+    fontSize: 13,
   },
   offlineHint: {
-    marginTop: 8,
-    fontSize: 11,
+    marginTop: 10,
+    fontSize: 12,
     color: '#F87171',
-    lineHeight: 15,
+    lineHeight: 17,
   },
 });

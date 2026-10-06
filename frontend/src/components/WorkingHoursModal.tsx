@@ -73,12 +73,12 @@ export const WorkingHoursModal: React.FC<WorkingHoursModalProps> = ({
           </View>
 
           <View style={styles.btnRow}>
-            <TouchableOpacity style={styles.cancelBtn} onPress={onClose}>
+            <TouchableOpacity style={styles.cancelBtn} onPress={onClose} activeOpacity={0.8}>
               <Text style={styles.cancelText}>Cancel</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
-              <Text style={styles.saveText}>Save Hours</Text>
+            <TouchableOpacity style={styles.saveBtn} onPress={handleSave} activeOpacity={0.85}>
+              <Text style={styles.saveText}>Save Hours →</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -90,7 +90,7 @@ export const WorkingHoursModal: React.FC<WorkingHoursModalProps> = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.65)',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
@@ -99,77 +99,80 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 380,
     backgroundColor: colors.bgCard,
-    borderRadius: 20,
-    borderWidth: 1,
+    borderRadius: 22,
+    borderWidth: 1.2,
     borderColor: colors.borderGlass,
     padding: 24,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.5,
+    shadowOpacity: 0.55,
     shadowRadius: 20,
     elevation: 10,
   },
   title: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '800',
     color: colors.textPrimary,
     letterSpacing: 0.6,
   },
   subtitle: {
-    fontSize: 12,
+    fontSize: 13,
     color: colors.textSecondary,
     marginTop: 4,
     marginBottom: 20,
+    lineHeight: 18,
   },
   inputGroup: {
     marginBottom: 16,
   },
   label: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '700',
     color: colors.textSecondary,
-    marginBottom: 6,
+    marginBottom: 8,
   },
   input: {
-    height: 48,
+    height: 52,
     backgroundColor: colors.bgInput,
-    borderRadius: 12,
-    borderWidth: 1,
+    borderRadius: 14,
+    borderWidth: 1.2,
     borderColor: colors.borderSubtle,
-    paddingHorizontal: 14,
+    paddingHorizontal: 16,
     color: colors.textPrimary,
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '600',
   },
   btnRow: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
     gap: 12,
-    marginTop: 10,
+    marginTop: 12,
   },
   cancelBtn: {
-    paddingVertical: 12,
-    paddingHorizontal: 18,
-    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 14,
+    borderWidth: 1.2,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
   cancelText: {
     color: colors.textSecondary,
     fontWeight: '700',
-    fontSize: 14,
+    fontSize: 15,
   },
   saveBtn: {
     backgroundColor: colors.primary,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 22,
+    borderRadius: 14,
     shadowColor: colors.primaryGlow,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.4,
+    shadowOpacity: 0.45,
     shadowRadius: 6,
   },
   saveText: {
     color: '#FFF',
     fontWeight: '800',
-    fontSize: 14,
+    fontSize: 15,
   },
 });

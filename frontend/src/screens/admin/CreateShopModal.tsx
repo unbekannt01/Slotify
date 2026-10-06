@@ -149,7 +149,7 @@ export const CreateShopModal: React.FC<CreateShopModalProps> = ({
                 style={styles.input}
                 value={email}
                 onChangeText={setEmail}
-                placeholder="owner@salon.com"
+                placeholder="owner@studio.com"
                 placeholderTextColor={colors.textMuted}
                 autoCapitalize="none"
                 keyboardType="email-address"
@@ -157,23 +157,23 @@ export const CreateShopModal: React.FC<CreateShopModalProps> = ({
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Owner Password *</Text>
+              <Text style={styles.label}>Temporary Password *</Text>
               <TextInput
                 style={styles.input}
                 value={password}
                 onChangeText={setPassword}
-                placeholder="Minimum 6 characters"
+                placeholder="••••••••"
                 placeholderTextColor={colors.textMuted}
                 secureTextEntry
               />
             </View>
 
-            {/* Schedule Configuration */}
-            <Text style={styles.sectionHeader}>SCHEDULE PRESETS</Text>
+            {/* Initial Schedule Parameters */}
+            <Text style={styles.sectionHeader}>SCHEDULE PARAMETERS</Text>
 
             <View style={styles.inputRow}>
               <View style={[styles.inputGroup, { flex: 1 }]}>
-                <Text style={styles.label}>Open Time</Text>
+                <Text style={styles.label}>Start (HH:MM)</Text>
                 <TextInput
                   style={styles.input}
                   value={start}
@@ -184,7 +184,7 @@ export const CreateShopModal: React.FC<CreateShopModalProps> = ({
               </View>
 
               <View style={[styles.inputGroup, { flex: 1 }]}>
-                <Text style={styles.label}>Close Time</Text>
+                <Text style={styles.label}>End (HH:MM)</Text>
                 <TextInput
                   style={styles.input}
                   value={end}
@@ -196,39 +196,42 @@ export const CreateShopModal: React.FC<CreateShopModalProps> = ({
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Slot Interval: {duration} minutes</Text>
+              <Text style={styles.label}>Default Slot Duration</Text>
               <View style={styles.durationRow}>
-                {[15, 30, 45, 60].map((d) => (
+                {[15, 30, 45, 60].map((dur) => (
                   <TouchableOpacity
-                    key={d}
+                    key={dur}
                     style={[
                       styles.durChip,
-                      duration === d && styles.durChipActive,
+                      duration === dur && styles.durChipActive,
                     ]}
-                    onPress={() => setDuration(d)}
+                    onPress={() => setDuration(dur)}
+                    activeOpacity={0.7}
                   >
                     <Text
                       style={[
                         styles.durChipText,
-                        duration === d && styles.durChipTextActive,
+                        duration === dur && styles.durChipTextActive,
                       ]}
                     >
-                      {d}m
+                      {dur}m
                     </Text>
                   </TouchableOpacity>
                 ))}
               </View>
             </View>
 
+            {/* Submit */}
             <TouchableOpacity
               style={styles.submitBtn}
               onPress={handleSubmit}
               disabled={loading}
+              activeOpacity={0.85}
             >
               {loading ? (
                 <ActivityIndicator color="#FFF" />
               ) : (
-                <Text style={styles.submitBtnText}>Provision Shop & Owner →</Text>
+                <Text style={styles.submitBtnText}>Create Shop & Assign Owner →</Text>
               )}
             </TouchableOpacity>
           </ScrollView>
@@ -244,125 +247,130 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 16,
+    padding: 18,
   },
   card: {
     width: '100%',
-    maxWidth: 440,
     maxHeight: '90%',
     backgroundColor: colors.bgCard,
-    borderRadius: 24,
-    borderWidth: 1,
+    borderRadius: 22,
+    borderWidth: 1.2,
     borderColor: colors.borderGlass,
-    padding: 24,
+    padding: 22,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.5,
-    shadowRadius: 24,
-    elevation: 12,
+    shadowOpacity: 0.55,
+    shadowRadius: 20,
+    elevation: 10,
   },
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 16,
+    marginBottom: 18,
   },
   modalTag: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: '800',
     color: colors.primaryGlow,
     letterSpacing: 1,
   },
   modalTitle: {
-    fontSize: 18,
+    fontSize: 19,
     fontWeight: '900',
     color: colors.textPrimary,
-    marginTop: 2,
+    marginTop: 3,
   },
   closeBtn: {
-    padding: 6,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   closeBtnText: {
+    fontSize: 15,
     color: colors.textSecondary,
-    fontSize: 18,
     fontWeight: '700',
   },
   sectionHeader: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '800',
-    color: colors.textMuted,
+    color: colors.textSecondary,
     letterSpacing: 0.8,
     marginTop: 14,
-    marginBottom: 8,
-    paddingTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.06)',
+    marginBottom: 10,
   },
   inputGroup: {
-    marginBottom: 12,
+    marginBottom: 14,
   },
   inputRow: {
     flexDirection: 'row',
     gap: 12,
   },
   label: {
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: 13,
+    fontWeight: '700',
     color: colors.textSecondary,
-    marginBottom: 5,
+    marginBottom: 6,
   },
   input: {
-    height: 46,
+    height: 50,
     backgroundColor: colors.bgInput,
-    borderRadius: 12,
-    borderWidth: 1,
+    borderRadius: 14,
+    borderWidth: 1.2,
     borderColor: colors.borderSubtle,
-    paddingHorizontal: 14,
+    paddingHorizontal: 16,
     color: colors.textPrimary,
-    fontSize: 14,
+    fontSize: 15,
+    fontWeight: '500',
   },
   durationRow: {
     flexDirection: 'row',
-    gap: 8,
+    gap: 10,
     marginTop: 4,
   },
   durChip: {
     flex: 1,
-    paddingVertical: 8,
-    borderRadius: 10,
+    height: 44,
+    borderRadius: 12,
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    borderWidth: 1,
+    borderWidth: 1.2,
     borderColor: 'rgba(255, 255, 255, 0.08)',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   durChipActive: {
     backgroundColor: 'rgba(99, 102, 241, 0.25)',
     borderColor: colors.primaryGlow,
   },
   durChipText: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '700',
     color: colors.textSecondary,
   },
   durChipTextActive: {
     color: '#FFF',
+    fontWeight: '900',
   },
   submitBtn: {
     backgroundColor: colors.primary,
-    paddingVertical: 14,
+    height: 52,
     borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 18,
-    marginBottom: 8,
+    marginTop: 20,
+    marginBottom: 10,
     shadowColor: colors.primaryGlow,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
+    shadowOpacity: 0.45,
     shadowRadius: 10,
+    elevation: 4,
   },
   submitBtnText: {
     color: '#FFF',
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '800',
     letterSpacing: 0.4,
   },
